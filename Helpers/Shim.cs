@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
+using Manager.UserDatas;
 using Net.Packet;
 using Net.Packet.Mai2;
 
@@ -64,4 +67,24 @@ public static class Shim
         throw new MissingMethodException("No matching PacketUpsertUserAll constructor found");
       }
     })();
+
+    public static IEnumerable<UserScore>[] GetUserScoreList(UserData userData)
+    {
+      var tUserData = Traverse.Create(userData);
+
+      var tScoreList = tUserData.Property("ScoreList");
+      if (tScoreList.PropertyExists())
+      {
+        return tScoreList.GetValue<List<UserScore>[]>();
+      }
+
+      var tScoreDic = tUserData.Property("ScoreDic");
+      if (tScoreDic.PropertyExists())
+      {
+        var scoreDic = tScoreDic.GetValue<Dictionary<int, UserScore>[]>();
+        return scoreDic.Select(dic => dic.Values).ToArray();
+      }
+
+      throw new MissingFieldException("No matching UserData.ScoreList/ScoreDic found");
+    }
 }

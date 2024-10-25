@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AquaMai.Helpers;
 using AquaMai.Resources;
-using AquaMai.Utils;
-using CriAtomDebugDetail;
 using DB;
 using HarmonyLib;
 using MAI2.Util;
@@ -16,7 +14,6 @@ using MelonLoader;
 using Monitor.Entry.Parts.Screens;
 using Net.Packet;
 using Net.Packet.Helper;
-using Net.Packet.Mai2;
 using Process;
 using Process.UserDataNet.State.UserDataULState;
 using UnityEngine;
@@ -109,7 +106,6 @@ public class ImmediateSave
     private static void SaveDataFix(UserData userData)
     {
         UserDetail detail = userData.Detail;
-        _ = userData.ScoreList;
         detail.EventWatchedDate = TimeManager.GetDateString(TimeManager.PlayBaseTime);
         userData.CalcTotalValue();
         float num = 0f;
@@ -147,7 +143,7 @@ public class ImmediateSave
 
         List<UserRate> list = new List<UserRate>();
         List<UserRate> list2 = new List<UserRate>();
-        List<UserScore>[] scoreList = userData.ScoreList;
+        IEnumerable<UserScore>[] scoreList = Shim.GetUserScoreList(userData);
         List<UserRate> ratingList = userData.RatingList.RatingList;
         List<UserRate> newRatingList = userData.RatingList.NewRatingList;
         int achive = RatingTableID.Rate_22.GetAchive();
