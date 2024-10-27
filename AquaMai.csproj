@@ -287,8 +287,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="AquaMai.zh.toml" WithCulture="false" />
-    <EmbeddedResource Include="AquaMai.toml" />
     <EmbeddedResource Include="Resources\Locale.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Locale.Designer.cs</LastGenOutput>
@@ -311,6 +309,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Samboy063.Tomlet" Version="5.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="genConfig.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
