@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Monitor;
 using UI;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class DisableTrackStartTabs
 {
     // 在歌曲开始界面, 把 TRACK X 字样, DX/标准谱面的显示框, 以及画面下方的滴蜡熊隐藏掉, 让他看起来不那么 sinmai, 更像是 majdata
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(TrackStartMonitor), "SetTrackStart")]
     private static void DisableTabs(

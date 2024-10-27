@@ -7,7 +7,7 @@ using Process;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class CustomLogo
 {

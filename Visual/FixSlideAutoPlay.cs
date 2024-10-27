@@ -3,7 +3,7 @@ using HarmonyLib;
 using Manager;
 using Monitor;
 
-namespace AquaMai.Fix;
+namespace AquaMai.Visual;
 
 public class FixSlideAutoPlay
 {

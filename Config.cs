@@ -38,6 +38,11 @@ public class Config
     public TimeSaving.Config TimeSaving { get; set; } = new();
 
     [ConfigComment(
+        en: "Visual effects of notes and judgment display and some other textures",
+        zh: "音符和判定表示以及一些其他贴图的视觉效果调整")]
+    public Visual.Config Visual { get; set; } = new();
+
+    [ConfigComment(
         zh: "窗口相关设置")]
     public WindowState.Config WindowState { get; set; } = new();
 

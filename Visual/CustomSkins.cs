@@ -8,7 +8,7 @@ using Monitor.Game;
 using Process;
 using UnityEngine;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class CustomSkins
 {
@@ -18,7 +18,7 @@ public class CustomSkins
 
     private static Sprite customOutline;
     private static Sprite[,] customSlideFan = new Sprite[4, 11];
-    
+
     public static readonly Sprite[,] CustomJudge = new Sprite[2, ((int)NoteJudge.ETiming.End + 1)];
     public static readonly Sprite[,,,] CustomJudgeSlide = new Sprite[2, 3, 2, ((int)NoteJudge.ETiming.End + 1)];
     public static readonly Texture2D[] CustomTrackStart = new Texture2D[4];
@@ -113,7 +113,7 @@ public class CustomSkins
             int? idx3 = (args.Length < 4) ? null : (int.TryParse(args[3], out temp) ? temp : null);
 
             Traverse traverse;
-            
+
             if (CustomTrackStartFields.Contains(fieldName))
             {
                 var i = CustomTrackStartFields.IndexOf(fieldName);
@@ -142,7 +142,7 @@ public class CustomSkins
                 MelonLogger.Msg($"[CustomNoteSkin] Successfully loaded {name}");
                 continue;
             }
-            
+
             if (fieldName == "_judgeSlideNormal" || fieldName == "_judgeSlideBreak")
             {
                 if (!idx1.HasValue || !idx2.HasValue || !idx3.HasValue)

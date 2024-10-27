@@ -1,14 +1,13 @@
 ﻿using HarmonyLib;
-using Manager;
 using Monitor;
 using UnityEngine;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class JudgeDisplay4B
 {
     // 精确到子判定的自定义判定显示, 需要启用自定义皮肤功能 (理论上不启用自定义皮肤不会崩游戏, 只不过此时这个功能显然不会生效)
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(SlideJudge), "Initialize")]
     private static void SlideJudgeDisplay4B(
@@ -32,8 +31,8 @@ public class JudgeDisplay4B
             }
         }
     }
-    
-    
+
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(JudgeGrade), "Initialize")]
     private static void JudgeGradeDisplay4B(
@@ -47,7 +46,7 @@ public class JudgeDisplay4B
             ___SpriteRender.sprite = sprite;
         }
     }
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(JudgeGrade), "InitializeBreak")]
     private static void JudgeGradeBreakDisplay4B(
@@ -64,12 +63,12 @@ public class JudgeDisplay4B
             }
         }
     }
-    
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(JudgeGrade), "InitializeBreak")]
     private static void InitializeBreakFix(ref NoteJudge.EJudgeType type)
     {
         type = NoteJudge.EJudgeType.Break;
     }
-    
+
 }

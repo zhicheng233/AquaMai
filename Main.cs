@@ -9,6 +9,7 @@ using AquaMai.Helpers;
 using AquaMai.Resources;
 using AquaMai.Utils;
 using AquaMai.UX;
+using AquaMai.Visual;
 using MelonLoader;
 using Tomlet;
 using UnityEngine;
@@ -166,21 +167,18 @@ namespace AquaMai
             Patch(typeof(FixCheckAuth));
             Patch(typeof(DebugFeature));
             Patch(typeof(FixConnSlide));
+            // Visual
             Patch(typeof(FixSlideAutoPlay)); // Rename: SlideAutoPlayTweak -> FixSlideAutoPlay, 不过这个应该无副作用所以不需要改配置文件
             Patch(typeof(FixCircleSlideJudge)); // 这个我觉得算无副作用, 可以常开
             Patch(typeof(FixLevelDisplay));
+            Patch(typeof(CustomLogo));
             // UX
             Patch(typeof(CustomVersionString));
             Patch(typeof(CustomPlaceName));
             Patch(typeof(RunCommandOnEvents));
-            Patch(typeof(CustomLogo));
             // Utils
             Patch(typeof(JudgeAdjust));
             Patch(typeof(TouchPanelBaudRate));
-
-# if DEBUG
-            Patch(typeof(LogNetworkErrors));
-# endif
 
             // Apply patches based on the settings
             ApplyPatches();

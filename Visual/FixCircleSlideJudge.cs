@@ -2,10 +2,9 @@
 using HarmonyLib;
 using Manager;
 using Monitor;
-using Process;
 using UnityEngine;
 
-namespace AquaMai.Fix;
+namespace AquaMai.Visual;
 
 public class FixCircleSlideJudge
 {
@@ -39,5 +38,5 @@ public class FixCircleSlideJudge
         }
     }
 
-    
+
 }

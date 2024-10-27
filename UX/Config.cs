@@ -118,68 +118,9 @@ public class Config
     public bool CustomFont { get; set; }
 
     [ConfigComment(
-        en: """
-            Provide the ability to use custom skins (advanced feature)
-            Load skin textures from LocalAssets\Skins
-            """,
-        zh: """
-            提供自定义皮肤的能力（高级功能）
-            从 LocalAssets\Skins 中加载皮肤贴图
-            """)]
-    public bool CustomSkins { get; set; }
-
-    [ConfigComment(
-        en: """
-            More detailed judgment display
-            Requires CustomSkins to be enabled and the resource file to be downloaded
-            https://github.com/hykilpikonna/AquaDX/releases/download/nightly/JudgeDisplay4B.7z
-            """,
-        zh: """
-            更精细的判定表示
-            需开启 CustomSkins 并下载资源文件
-            https://github.com/hykilpikonna/AquaDX/releases/download/nightly/JudgeDisplay4B.7z
-            """)]
-    public bool JudgeDisplay4B { get; set; }
-
-    [ConfigComment(
-        en: """
-            Custom track start difficulty image (not really custom difficulty)
-            Requires CustomSkins to be enabled
-            Will load four image resources through custom skins: musicBase, musicTab, musicLvBase, musicLvText
-            """,
-        zh: """
-            自定义在歌曲开始界面上显示的难度贴图 (并不是真的自定义难度)
-            需要启用自定义皮肤功能
-            会通过自定义皮肤加载四个图片资源: musicBase, musicTab, musicLvBase, musicLvText
-            """)]
-    public bool CustomTrackStartDiff { get; set; }
-
-    [ConfigComment(
         en: "Map touch actions to buttons",
         zh: "映射触摸操作至实体按键")]
     public bool TouchToButtonInput { get; set; }
-
-    [ConfigComment(
-        en: """
-            Delayed the animation of the song start screen
-            For recording chart confirmation
-            """,
-        zh: """
-            推迟了歌曲开始界面的动画
-            录制谱面确认用
-            """)]
-    public bool TrackStartProcessTweak { get; set; }
-
-    [ConfigComment(
-        en: """
-            Disable the TRACK X text, DX/Standard display box, and the derakkuma at the bottom of the screen in the song start screen
-            For recording chart confirmation
-            """,
-        zh: """
-            在歌曲开始界面, 把 TRACK X 字样, DX/标准谱面的显示框, 以及画面下方的滴蜡熊隐藏掉
-            录制谱面确认用
-            """)]
-    public bool DisableTrackStartTabs { get; set; }
 
     [ConfigComment(
         en: "Cannot be used together with HanabiFix",

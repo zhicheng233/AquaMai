@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Monitor;
 
-namespace AquaMai.Fix;
+namespace AquaMai.Visual;
 
 public class FanJudgeFlip
 {

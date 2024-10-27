@@ -57,28 +57,6 @@ public class Config
 
     [ConfigComment(
         en: """
-            Make the judgment display of Wifi Slide different in up and down (originally all Wifi judgment displays are towards the center), just like in majdata
-            The reason for this bug is that SEGA forgot to assign EndButtonId to Wifi
-            """,
-        zh: """
-            这个 Patch 让 Wifi Slide 的判定显示有上下的区别 (原本所有 Wifi 的判定显示都是朝向圆心的), 就像 majdata 里那样
-            这个 bug 产生的原因是 SBGA 忘记给 Wifi 的 EndButtonId 赋值了
-            """)]
-    public bool FanJudgeFlip { get; set; }
-
-    [ConfigComment(
-        en: """
-            This Patch makes the Critical judgment of BreakSlide also flicker like BreakTap
-            Recommended to use with custom skins (otherwise the visual effect may not be good)
-            """,
-        zh: """
-            这个 Patch 让 BreakSlide 的 Critical 判定也可以像 BreakTap 一样闪烁
-            推荐与自定义皮肤一起使用 (否则视觉效果可能并不好)
-            """)]
-    public bool BreakSlideJudgeBlink { get; set; }
-
-    [ConfigComment(
-        en: """
             Make the AutoPlay random judgment mode really randomize all judgments (down to sub-judgments)
             The original random judgment will only produce all 15 judgment results from Miss(TooFast) ~ Critical ~ Miss(TooLate)
             Here, it is changed to a triangular distribution to produce all 15 judgment results from Miss(TooFast) ~ Critical ~ Miss(TooLate)

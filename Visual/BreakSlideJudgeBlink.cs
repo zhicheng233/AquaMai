@@ -2,7 +2,7 @@
 using Monitor;
 using UnityEngine;
 
-namespace AquaMai.Fix;
+namespace AquaMai.Visual;
 
 public class BreakSlideJudgeBlink
 {

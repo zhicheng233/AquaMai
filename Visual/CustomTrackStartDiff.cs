@@ -5,20 +5,20 @@ using UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class CustomTrackStartDiff
 {
     // 自定义在歌曲开始界面上显示的难度 (并不是真的自定义难度)
     // 需要启用自定义皮肤功能
     // 会加载四个图片资源: musicBase, musicTab, musicLvBase, musicLvText
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(TrackStartMonitor), "SetTrackStart")]
     private static void DisableTabs(
         MultipleImage ____musicBaseImage,
         MultipleImage ____musicTabImage,
-        SpriteCounter ____difficultySingle, 
+        SpriteCounter ____difficultySingle,
         SpriteCounter ____difficultyDouble,
         Image ____levelTextImage,
         List<ResultMonitor.SpriteSheet> ____musicLevelSpriteSheets,
@@ -31,7 +31,7 @@ public class CustomTrackStartDiff
             ____musicBaseImage.MultiSprites[6] = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
             ____musicBaseImage.ChangeSprite(6);
         }
-        
+
         texture = CustomSkins.CustomTrackStart[1];
         if (texture != null)
         {

@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
-using Monitor;
+﻿using HarmonyLib;
 using Process;
-using UI;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace AquaMai.UX;
+namespace AquaMai.Visual;
 
 public class TrackStartProcessTweak
 {
@@ -66,6 +62,6 @@ public class TrackStartProcessTweak
         return true;
     }
 
-    
+
 }
 
