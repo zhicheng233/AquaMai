@@ -9,7 +9,7 @@ public class Enable
     [HarmonyPostfix]
     public static void JvsButtonTableRecordConstructor(JvsButtonTableRecord __instance, string Name)
     {
-        var prop = (DB.KeyCodeID)typeof(Config.CustomKeyMapConfig).GetProperty(Name).GetValue(AquaMai.AppConfig.CustomKeyMap);
+        var prop = (DB.KeyCodeID)typeof(Config).GetProperty(Name).GetValue(AquaMai.AppConfig.CustomKeyMap);
         __instance.SubstituteKey = prop;
     }
 }
