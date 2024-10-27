@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using AquaMai.Attributes;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
@@ -42,26 +43,30 @@ namespace AquaMai.UX
             return false;
         }
 
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(EntryMonitor), "DecideEntry")]
-        public static void PostDecideEntry(EntryMonitor __instance)
+        [GameVersion(21500)]
+        public class SkipTimer
         {
-            MelonLogger.Msg("Confirm Entry");
-            TimeManager.MarkGameStartTime();
-            Singleton<EventManager>.Instance.UpdateEvent();
-            Singleton<ScoreRankingManager>.Instance.UpdateData();
-            __instance.Process.CreateDownloadProcess();
-            __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 30001));
-            __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 40000, 0, OperationInformationController.InformationType.Hide));
-            __instance.Process.SetNextProcess();
-        }
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(EntryMonitor), "DecideEntry")]
+            public static void PostDecideEntry(EntryMonitor __instance)
+            {
+                MelonLogger.Msg("Confirm Entry");
+                TimeManager.MarkGameStartTime();
+                Singleton<EventManager>.Instance.UpdateEvent();
+                Singleton<ScoreRankingManager>.Instance.UpdateData();
+                __instance.Process.CreateDownloadProcess();
+                __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 30001));
+                __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 40000, 0, OperationInformationController.InformationType.Hide));
+                __instance.Process.SetNextProcess();
+            }
 
-        // To prevent the "長押受付終了" overlay from appearing
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(WaitPartner), "Open")]
-        public static bool WaitPartnerPreOpen()
-        {
-            return false;
+            // To prevent the "長押受付終了" overlay from appearing
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(WaitPartner), "Open")]
+            public static bool WaitPartnerPreOpen()
+            {
+                return false;
+            }
         }
     }
 }
