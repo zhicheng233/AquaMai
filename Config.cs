@@ -188,9 +188,41 @@ namespace AquaMai
             public bool CustomFont { get; set; }
 
             [ConfigComment(
-                en: "Provide the ability to use custom note skins (advanced feature)",
-                zh: "提供自定义音符皮肤的能力（高级功能）")]
-            public bool CustomNoteSkin { get; set; }
+                en: """
+                    Provide the ability to use custom skins (advanced feature)
+                    Load skin textures from LocalAssets\Skins
+                    """,
+                zh: """
+                    提供自定义皮肤的能力（高级功能）
+                    从 LocalAssets\Skins 中加载皮肤贴图
+                    """)]
+            public bool CustomSkins { get; set; }
+
+            [ConfigComment(
+                en: """
+                    More detailed judgment display
+                    Requires CustomSkins to be enabled and the resource file to be downloaded
+                    https://github.com/hykilpikonna/AquaDX/releases/download/nightly/JudgeDisplay4B.7z
+                    """,
+                zh: """
+                    更精细的判定表示
+                    需开启 CustomSkins 并下载资源文件
+                    https://github.com/hykilpikonna/AquaDX/releases/download/nightly/JudgeDisplay4B.7z
+                    """)]
+            public bool JudgeDisplay4B { get; set; }
+
+            [ConfigComment(
+                en: """
+                    Custom track start difficulty image (not really custom difficulty)
+                    Requires CustomSkins to be enabled
+                    Will load four image resources through custom skins: musicBase, musicTab, musicLvBase, musicLvText
+                    """,
+                zh: """
+                    自定义在歌曲开始界面上显示的难度贴图 (并不是真的自定义难度)
+                    需要启用自定义皮肤功能
+                    会通过自定义皮肤加载四个图片资源: musicBase, musicTab, musicLvBase, musicLvText
+                    """)]
+            public bool CustomTrackStartDiff { get; set; }
 
             [ConfigComment(
                 en: "Map touch actions to buttons",
@@ -200,15 +232,24 @@ namespace AquaMai
             [ConfigComment(
                 en: """
                     Delayed the animation of the song start screen
-                    Hide "TRACK X" text and DX/Standard chart display box
                     For recording chart confirmation
                     """,
                 zh: """
                     推迟了歌曲开始界面的动画
-                    隐藏“TRACK X”字样和 DX/标准谱面的显示框
                     录制谱面确认用
                     """)]
             public bool TrackStartProcessTweak { get; set; }
+
+            [ConfigComment(
+                en: """
+                    Disable the TRACK X text, DX/Standard display box, and the derakkuma at the bottom of the screen in the song start screen
+                    For recording chart confirmation
+                    """,
+                zh: """
+                    在歌曲开始界面, 把 TRACK X 字样, DX/标准谱面的显示框, 以及画面下方的滴蜡熊隐藏掉
+                    录制谱面确认用
+                    """)]
+            public bool DisableTrackStartTabs { get; set; }
 
             [ConfigComment(
                 en: "Cannot be used together with HanabiFix",
@@ -303,14 +344,40 @@ namespace AquaMai
 
             [ConfigComment(
                 en: """
-                    Make the Critical judgment of BreakSlide flash like BreakTap
-                    Align the judgment display of arc-shaped Slide with the judgment line accurately (it was slightly off before)
+                    Make the judgment display of Wifi Slide different in up and down (originally all Wifi judgment displays are towards the center), just like in majdata
+                    The reason for this bug is that SEGA forgot to assign EndButtonId to Wifi
                     """,
                 zh: """
-                    让 BreakSlide 的 Critical 判定也可以像 BreakTap 一样闪烁
-                    让圆弧形的 Slide 的判定显示与判定线精确对齐 (原本会有一点歪)
+                    这个 Patch 让 Wifi Slide 的判定显示有上下的区别 (原本所有 Wifi 的判定显示都是朝向圆心的), 就像 majdata 里那样
+                    这个 bug 产生的原因是 SBGA 忘记给 Wifi 的 EndButtonId 赋值了
                     """)]
-            public bool SlideJudgeTweak { get; set; }
+            public bool FanJudgeFlip { get; set; }
+
+            [ConfigComment(
+                en: """
+                    This Patch makes the Critical judgment of BreakSlide also flicker like BreakTap
+                    Recommended to use with custom skins (otherwise the visual effect may not be good)
+                    """,
+                zh: """
+                    这个 Patch 让 BreakSlide 的 Critical 判定也可以像 BreakTap 一样闪烁
+                    推荐与自定义皮肤一起使用 (否则视觉效果可能并不好)
+                    """)]
+            public bool BreakSlideJudgeBlink { get; set; }
+
+            [ConfigComment(
+                en: """
+                    Make the AutoPlay random judgment mode really randomize all judgments (down to sub-judgments)
+                    // The original random judgment will only produce all 15 judgment results from Miss(TooFast) ~ Critical ~ Miss(TooLate)
+                    // Here, it is changed to a triangular distribution to produce all 15 judgment results from Miss(TooFast) ~ Critical ~ Miss(TooLate)
+                    // Of course, it will not consider whether the original Note really has a corresponding judgment (such as Slide should not have non-Critical Prefect)
+                    """,
+                zh: """
+                    让 AutoPlay 的随机判定模式真的会随机产生所有的判定 (精确到子判定)
+                    // 原本的随机判定只会等概率产生 Critical, LateGreat1st, LateGood, Miss(TooLate)
+                    // 这里改成三角分布产生从 Miss(TooFast) ~ Critical ~ Miss(TooLate) 的所有 15 种判定结果
+                    // 当然, 此处并不会考虑原本那个 Note 是不是真的有对应的判定 (比如 Slide 实际上不应该有小 p 之类的)
+                    """)]
+            public bool RealisticRandomJudge { get; set; }
 
             [ConfigComment(
                 en: "Cannot be used together with HideHanabi",
