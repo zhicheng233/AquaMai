@@ -152,6 +152,15 @@ namespace AquaMai.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Repeat end time cannot be less than repeat start time.
+        /// </summary>
+        internal static string RepeatEndTimeLessThenStartTime {
+            get {
+                return ResourceManager.GetString("RepeatEndTimeLessThenStartTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loop Not Set.
         /// </summary>
         internal static string RepeatNotSet {
@@ -188,6 +197,15 @@ namespace AquaMai.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please set repeat start time first.
+        /// </summary>
+        internal static string RepeatStartTimeNotSet {
+            get {
+                return ResourceManager.GetString("RepeatStartTimeNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saving... Do not exit the game.
         /// </summary>
         internal static string SavingDontExit {
@@ -220,6 +238,15 @@ namespace AquaMai.Resources {
         internal static string Skip {
             get {
                 return ResourceManager.GetString("Skip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &gt; Skipping incompatible patch: {0}.
+        /// </summary>
+        internal static string SkipIncompatiblePatch {
+            get {
+                return ResourceManager.GetString("SkipIncompatiblePatch", resourceCulture);
             }
         }
         

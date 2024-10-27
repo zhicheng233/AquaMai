@@ -44,7 +44,7 @@ namespace AquaMai
             {
                 if (!isNested)
                 {
-                    MelonLogger.Warning($"> Skipping incompatible patch: {type}");
+                    MelonLogger.Warning(string.Format(Locale.SkipIncompatiblePatch, type));
                 }
 
                 return;

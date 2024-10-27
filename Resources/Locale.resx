@@ -86,4 +86,13 @@
     <data name="Skip" xml:space="preserve">
         <value>Skip</value>
     </data>
+    <data name="SkipIncompatiblePatch" xml:space="preserve">
+        <value>&gt; Skipping incompatible patch: {0}</value>
+    </data>
+    <data name="RepeatStartTimeNotSet" xml:space="preserve">
+        <value>Please set repeat start time first</value>
+    </data>
+    <data name="RepeatEndTimeLessThenStartTime" xml:space="preserve">
+        <value>Repeat end time cannot be less than repeat start time</value>
+    </data>
 </root>

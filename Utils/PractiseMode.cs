@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reflection;
 using AquaMai.Fix;
 using AquaMai.Helpers;
+using AquaMai.Resources;
 using HarmonyLib;
 using Manager;
 using Monitor;
@@ -28,13 +29,13 @@ public class PractiseMode
     {
         if (repeatStart == -1)
         {
-            MessageHelper.ShowMessage("Please set repeat start time first");
+            MessageHelper.ShowMessage(Locale.RepeatStartTimeNotSet);
             return;
         }
 
         if (time < repeatStart)
         {
-            MessageHelper.ShowMessage("Repeat end time cannot be less than repeat start time");
+            MessageHelper.ShowMessage(Locale.RepeatEndTimeLessThenStartTime);
             return;
         }
 

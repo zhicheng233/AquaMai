@@ -79,4 +79,13 @@
     <data name="Skip" xml:space="preserve">
         <value>跳过</value>
     </data>
+    <data name="SkipIncompatiblePatch" xml:space="preserve">
+        <value>&gt; 已跳过加载不兼容的功能: {0}</value>
+    </data>
+    <data name="RepeatEndTimeLessThenStartTime" xml:space="preserve">
+        <value>循环结束时间不能早于开始时间</value>
+    </data>
+    <data name="RepeatStartTimeNotSet" xml:space="preserve">
+        <value>请先设置循环开始时间</value>
+    </data>
 </root>
