@@ -1,9 +1,11 @@
-﻿using HarmonyLib;
+﻿using AquaMai.Attributes;
+using HarmonyLib;
 using MAI2System;
 using Manager;
 
 namespace AquaMai.Cheat
 {
+    [GameVersion(24000)]
     public class UnlockUtage
     {
         [HarmonyPrefix]

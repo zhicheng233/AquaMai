@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using AquaMai.Attributes;
 using AquaMai.Fix;
 using AquaMai.Helpers;
 using AquaMai.Resources;
@@ -29,15 +30,33 @@ namespace AquaMai
         public static Config AppConfig { get; private set; }
         private static bool _hasErrors;
 
-        private void Patch(Type type)
+        private void Patch(Type type, bool isNested = false)
         {
+            var versionAttr = type.GetCustomAttribute<GameVersionAttribute>();
+            var compatible = true;
+            if (versionAttr != null)
+            {
+                if (versionAttr.MinVersion > 0 && versionAttr.MinVersion > GameInfo.GameVersion) compatible = false;
+                if (versionAttr.MaxVersion > 0 && versionAttr.MaxVersion < GameInfo.GameVersion) compatible = false;
+            }
+
+            if (!compatible)
+            {
+                if (!isNested)
+                {
+                    MelonLogger.Warning($"> Skipping incompatible patch: {type}");
+                }
+
+                return;
+            }
+
             MelonLogger.Msg($"> Patching {type}");
             try
             {
                 HarmonyInstance.PatchAll(type);
                 foreach (var nested in type.GetNestedTypes())
                 {
-                    Patch(nested);
+                    Patch(nested, true);
                 }
 
                 var customMethod = type.GetMethod("DoCustomPatch", BindingFlags.Public | BindingFlags.Static);
@@ -143,15 +162,12 @@ namespace AquaMai
             Patch(typeof(FixCharaCrash));
             Patch(typeof(BasicFix));
             Patch(typeof(DisableReboot));
-            if (GameInfo.GameVersion >= 23000)
-                Patch(typeof(ExtendNotesPool));
+            Patch(typeof(ExtendNotesPool));
             Patch(typeof(FixCheckAuth));
             Patch(typeof(DebugFeature));
-            if (GameInfo.GameVersion >= 23000)
-                Patch(typeof(FixConnSlide));
+            Patch(typeof(FixConnSlide));
             Patch(typeof(FixSlideAutoPlay)); // Rename: SlideAutoPlayTweak -> FixSlideAutoPlay, 不过这个应该无副作用所以不需要改配置文件
-            if (GameInfo.GameVersion >= 24000)
-                Patch(typeof(FixLevelDisplay));
+            Patch(typeof(FixLevelDisplay));
             // UX
             Patch(typeof(CustomVersionString));
             Patch(typeof(CustomPlaceName));

@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using AquaMai.Attributes;
+using HarmonyLib;
 using MAI2.Util;
 using Manager;
 using Monitor;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 namespace AquaMai.Fix;
 
+[GameVersion(24000)]
 public class FixLevelDisplay
 {
     [HarmonyPostfix]

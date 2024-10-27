@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AquaMai.Attributes;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
@@ -9,6 +10,7 @@ using UnityEngine;
 
 namespace AquaMai.Fix;
 
+[GameVersion(23000)]
 public class ExtendNotesPool
 {
     [HarmonyPostfix]

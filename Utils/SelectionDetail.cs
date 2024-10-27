@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AquaMai.Attributes;
 using AquaMai.Helpers;
 using AquaMai.Resources;
 using HarmonyLib;
@@ -13,6 +14,7 @@ using UnityEngine;
 
 namespace AquaMai.Utils;
 
+[GameVersion(23500)]
 public class SelectionDetail
 {
     private static readonly Window[] window = new Window[2];

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AquaMai.Attributes;
 using AquaMai.Helpers;
 using HarmonyLib;
 using Mai2.Mai2Cue;
@@ -86,13 +87,8 @@ public class QuickSkip
         }
     }
 
-    public static void DoCustomPatch(HarmonyLib.Harmony h)
-    {
-        if (GameInfo.GameVersion < 23000) return;
-        h.PatchAll(typeof(FestivalAndLaterQuickRetryPatch));
-    }
-
-    private class FestivalAndLaterQuickRetryPatch
+    [GameVersion(23000)]
+    public class FestivalAndLaterQuickRetryPatch
     {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(QuickRetry), "IsQuickRetryEnable")]

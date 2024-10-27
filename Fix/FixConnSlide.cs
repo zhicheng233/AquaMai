@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using AquaMai.Attributes;
 using HarmonyLib;
 using Manager;
 using MelonLoader;
@@ -7,12 +8,13 @@ using Monitor;
 
 namespace AquaMai.Fix;
 
+[GameVersion(23000)]
 public class FixConnSlide
 {
     /* 这个 Patch 用于修复以下 bug:
      *     非 ConnSlide 被错误解析为 ConnSlide (Fes 首日刹那旅程爆机 bug)
      * 原 method 逻辑如下:
-     * 
+     *
      *     if (this.IsSlideAll(noteData1.type) && (index1 + 1 < this._note._noteData.Count ? 1 : 0) != 0)
      *     {
      *         int targetNote = noteData1.slideData.targetNote;
@@ -31,7 +33,7 @@ public class FixConnSlide
      *             }
      *         }
      *     }
-     * 
+     *
      * 修复 bug 需要把第二次调用 this.IsSlideAll() 更改为 this.IsConnectNote(), 这里使用 Transpiler 解决
      */
     [HarmonyTranspiler]
@@ -42,7 +44,7 @@ public class FixConnSlide
         bool found = false;
         MethodInfo methodIsSlideAll = AccessTools.Method(typeof(NotesReader), "IsSlideAll");
         MethodInfo methodIsConnectNote = AccessTools.Method(typeof(NotesReader), "IsConnectNote");
-        
+
         for (int i = 0; i < instList.Count; i++)
         {
             CodeInstruction inst = instList[i];
