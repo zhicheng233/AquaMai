@@ -13,7 +13,7 @@ using Process;
 using UnityEngine;
 using Util;
 
-namespace AquaMai.UX;
+namespace AquaMai.ModKeyMap;
 
 public class HideSelfMadeCharts
 {
@@ -53,33 +53,20 @@ public class HideSelfMadeCharts
         __result = _musicsNoneSelfMade;
     }
 
-    private static int _keyPressFrames;
-
     [HarmonyPostfix]
     [HarmonyPatch(typeof(MusicSelectProcess), "OnUpdate")]
     public static void MusicSelectProcessOnUpdate(ref MusicSelectProcess __instance)
     {
         if (isForceDisable) return;
-        if (Input.GetKey(KeyCode.Alpha7) || InputManager.GetSystemInputPush(InputManager.SystemButtonSetting.ButtonService))
+        if (!ModKeyListener.GetKeyDownOrLongPress(AquaMai.AppConfig.ModKeyMap.HideSelfMadeCharts, AquaMai.AppConfig.ModKeyMap.HideSelfMadeChartsLongPress)) return;
+        isShowSelfMadeCharts = !isShowSelfMadeCharts;
+        MelonLogger.Msg($"[HideSelfMadeCharts] isShowSelfMadeCharts: {isShowSelfMadeCharts}");
+        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, __instance, new MusicSelectProcess(SharedInstances.ProcessDataContainer)));
+        Task.Run(async () =>
         {
-            _keyPressFrames++;
-        }
-        else if (_keyPressFrames is > 0 and < 30 && !Input.GetKey(KeyCode.Alpha7) && !InputManager.GetSystemInputPush(InputManager.SystemButtonSetting.ButtonService))
-        {
-            _keyPressFrames = 0;
-            isShowSelfMadeCharts = !isShowSelfMadeCharts;
-            MelonLogger.Msg($"[HideSelfMadeCharts] isShowSelfMadeCharts: {isShowSelfMadeCharts}");
-            SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, __instance, new MusicSelectProcess(SharedInstances.ProcessDataContainer)));
-            Task.Run(async () =>
-            {
-                await Task.Delay(1000);
-                MessageHelper.ShowMessage($"{(isShowSelfMadeCharts ? "Show" : "Hide")} Self-Made Charts");
-            });
-        }
-        else
-        {
-            _keyPressFrames = 0;
-        }
+            await Task.Delay(1000);
+            MessageHelper.ShowMessage($"{(isShowSelfMadeCharts ? "Show" : "Hide")} Self-Made Charts");
+        });
     }
 
     [HarmonyPrefix]

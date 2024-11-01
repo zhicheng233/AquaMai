@@ -43,6 +43,10 @@ public class Config
     public Visual.Config Visual { get; set; } = new();
 
     [ConfigComment(
+        zh: "Mod 内功能的按键设置")]
+    public ModKeyMap.Config ModKeyMap { get; set; } = new();
+
+    [ConfigComment(
         zh: "窗口相关设置")]
     public WindowState.Config WindowState { get; set; } = new();
 

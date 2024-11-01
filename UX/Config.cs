@@ -34,21 +34,6 @@ public class Config
 
     [ConfigComment(
         en: """
-            Press key "7" for 1 second to skip to next step or restart current song
-            Hold the bottom four buttons (3456) for official quick retry (non-utage only)
-            """,
-        zh: """
-            长按 Service 键或者键盘上的 “7” 键（ADX 默认固件下箭头键中间的圆形按键）可以：
-            - 跳过登录过程中的界面直接进入选歌界面
-            - 在选歌界面直接结束游戏
-            在游玩界面，按一下 “7” 或者 Service 键重开当前的歌，按 1P 的“选择”键立即结束当前乐曲
-            打完最后一个音符之后也可以
-            按住下方四个按钮（3456）使用官方快速重开（仅对非宴谱有效）
-            """)]
-    public bool QuickSkip { get; set; }
-
-    [ConfigComment(
-        en: """
             Random BGM, put Mai2Cue.{acb,awb} of old version of the game in `LocalAssets\Mai2Cue` and rename them
             Do not enable when SinglePlayer is off
             """,
@@ -89,22 +74,6 @@ public class Config
             请和 `LoadJacketPng` 一起用
             """)]
     public bool LoadLocalBga { get; set; }
-
-    [ConfigComment(
-        en: "Prevent accidental touch of the Test button, requires 1 second long press to take effect",
-        zh: "防止你不小心按到 Test 键，Test 键需要长按 1 秒才能生效")]
-    public bool TestProof { get; set; }
-
-    [ConfigComment(
-        en: """
-            In the song selection screen, press the Service button or the "7" key (the round button in the middle of the arrow keys in the default ADX firmware) to toggle the display of self-made charts.
-            A directory is considered to contain self-made charts if it does not have DataConfig.xml or OfficialChartsMark.txt in the Axxx directory.
-            """,
-        zh: """
-            选歌界面按下 Service 键或者键盘上的 “7” 键（ADX 默认固件下箭头键中间的圆形按键）切换自制谱的显示和隐藏
-            是否是自制谱的判断方式是 Axxx 目录里没有 DataConfig.xml 或 OfficialChartsMark.txt 就认为这个目录里是自制谱
-            """)]
-    public bool HideSelfMadeCharts { get; set; }
 
     [ConfigComment(
         en: """

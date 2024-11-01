@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using AquaMai.Attributes;
 using AquaMai.Fix;
 using AquaMai.Helpers;
+using AquaMai.ModKeyMap;
 using AquaMai.Resources;
 using AquaMai.Utils;
 using AquaMai.UX;
@@ -167,6 +168,7 @@ namespace AquaMai
             Patch(typeof(FixCheckAuth));
             Patch(typeof(DebugFeature));
             Patch(typeof(FixConnSlide));
+            Patch(typeof(FestivalQuickRetryFix));
             // Visual
             Patch(typeof(FixSlideAutoPlay)); // Rename: SlideAutoPlayTweak -> FixSlideAutoPlay, 不过这个应该无副作用所以不需要改配置文件
             Patch(typeof(FixCircleSlideJudge)); // 这个我觉得算无副作用, 可以常开
@@ -179,6 +181,13 @@ namespace AquaMai
             // Utils
             Patch(typeof(JudgeAdjust));
             Patch(typeof(TouchPanelBaudRate));
+            // ModKeyMap
+            // TODO: Make it configurable
+            Patch(typeof(ModKeyListener));
+            Patch(typeof(QuickSkip));
+            Patch(typeof(TestProof));
+            Patch(typeof(PractiseMode));
+            Patch(typeof(HideSelfMadeCharts));
 
             // Apply patches based on the settings
             ApplyPatches();

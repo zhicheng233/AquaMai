@@ -5,7 +5,7 @@ using AquaMai.Resources;
 using Manager;
 using UnityEngine;
 
-namespace AquaMai.Utils;
+namespace AquaMai.ModKeyMap;
 
 public class PractiseModeUI : MonoBehaviour
 {

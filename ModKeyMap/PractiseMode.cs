@@ -6,6 +6,7 @@ using System.Reflection;
 using AquaMai.Fix;
 using AquaMai.Helpers;
 using AquaMai.Resources;
+using AquaMai.Utils;
 using HarmonyLib;
 using Manager;
 using Monitor;
@@ -13,7 +14,7 @@ using Monitor.Game;
 using Process;
 using UnityEngine;
 
-namespace AquaMai.Utils;
+namespace AquaMai.ModKeyMap;
 
 public class PractiseMode
 {
@@ -172,7 +173,7 @@ public class PractiseMode
     [HarmonyPostfix]
     public static void GameProcessPostUpdate(GameProcess __instance, GameMonitor[] ____monitors)
     {
-        if (InputManager.GetSystemInputPush(InputManager.SystemButtonSetting.ButtonTest) && ui is null)
+        if (ModKeyListener.GetKeyDownOrLongPress(AquaMai.AppConfig.ModKeyMap.PractiseMode, AquaMai.AppConfig.ModKeyMap.PractiseModeLongPress) && ui is null)
         {
             ui = ____monitors[0].gameObject.AddComponent<PractiseModeUI>();
         }

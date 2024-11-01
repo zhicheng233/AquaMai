@@ -25,17 +25,6 @@ public class Config
     public int TouchDelay { get; set; }
 
     [ConfigComment(
-        en: """
-            Practice mode, activated by pressing Test in the game
-            Must be used together with TestProof
-            """,
-        zh: """
-            练习模式，在游戏中按 Test 打开
-            必须和 TestProof 一起用
-            """)]
-    public bool PractiseMode { get; set; }
-
-    [ConfigComment(
         en: "Show detail of selected song in music selection screen",
         zh: "选歌界面显示选择的歌曲的详情")]
     public bool SelectionDetail { get; set; }
