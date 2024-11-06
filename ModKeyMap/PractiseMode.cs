@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using AquaMai.Fix;
 using AquaMai.Helpers;
@@ -9,6 +10,7 @@ using AquaMai.Resources;
 using AquaMai.Utils;
 using HarmonyLib;
 using Manager;
+using MelonLoader;
 using Monitor;
 using Monitor.Game;
 using Process;
@@ -200,6 +202,13 @@ public class PractiseMode
     [HarmonyPrefix]
     public static bool NotesManagerPostUpdateTimer(bool ____isPlaying, Stopwatch ____stopwatch, ref float ____curMSec, ref float ____curMSecPre, float ____msecStartGap)
     {
+        var stackTrace = new StackTrace(); // get call stack
+        var stackFrames = stackTrace.GetFrames(); // get method calls (frames)
+        if(stackFrames.Select(it => it.GetMethod().DeclaringType.Name).Contains("AdvDemoProcess"))
+        {
+            return true;
+        }
+
         if (startGap != -1f)
         {
             ____curMSec = startGap;
