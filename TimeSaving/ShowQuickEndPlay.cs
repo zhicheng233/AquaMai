@@ -47,14 +47,14 @@ public class ShowQuickEndPlay
         public void OnGUI()
         {
             if (!_showUi) return;
-            var style = GUI.skin.GetStyle("button");
-            style.fontSize = GuiSizes.FontSize;
 
+            // 这里重新 setup 一下 style 也可以
             var x = GuiSizes.PlayerCenter;
             var y = Screen.height - GuiSizes.PlayerWidth * .37f;
             var width = GuiSizes.PlayerWidth * .25f;
             var height = GuiSizes.PlayerWidth * .13f;
 
+            GUI.Box(new Rect(x, y, width, height), "");
             GUI.Button(new Rect(x, y, width, height), Locale.Skip);
         }
     }
