@@ -60,6 +60,24 @@ namespace AquaMai.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are using AquaMai CI build version. This version is built from the latest mainline code and may contain undocumented configuration changes or potential issues..
+        /// </summary>
+        internal static string CiBuildAlertContent {
+            get {
+                return ResourceManager.GetString("CiBuildAlertContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Important Notice: Test Version.
+        /// </summary>
+        internal static string CiBuildAlertTitle {
+            get {
+                return ResourceManager.GetString("CiBuildAlertTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loaded!.
         /// </summary>
         internal static string Loaded {

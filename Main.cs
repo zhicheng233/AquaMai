@@ -188,6 +188,9 @@ namespace AquaMai
             Patch(typeof(TestProof));
             Patch(typeof(PractiseMode));
             Patch(typeof(HideSelfMadeCharts));
+# if CI
+            Patch(typeof(CiBuildAlert));
+# endif
 
             // Apply patches based on the settings
             ApplyPatches();
@@ -197,6 +200,11 @@ namespace AquaMai
                 MelonLogger.Warning("========================================================================!!!\n" + Locale.LoadError);
                 MelonLogger.Warning("===========================================================================");
             }
+
+# if CI
+            MelonLogger.Warning(Locale.CiBuildAlertTitle);
+            MelonLogger.Warning(Locale.CiBuildAlertContent);
+# endif
 
             MelonLogger.Msg(Locale.Loaded);
         }
