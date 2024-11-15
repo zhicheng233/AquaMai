@@ -161,6 +161,15 @@ namespace AquaMai.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 游玩次数：{0}.
+        /// </summary>
+        internal static string PlayCount {
+            get {
+                return ResourceManager.GetString("PlayCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SSS+ =&gt; DXRating += {0}.
         /// </summary>
         internal static string RatingUpWhenSSSp {

@@ -69,6 +69,7 @@ public class SelectionDetail
     private abstract class Window : MonoBehaviour
     {
         protected abstract int player { get; }
+        private UserData userData => Singleton<UserDataManager>.Instance.GetUserData(player);
 
         public void OnGUI()
         {
@@ -86,6 +87,12 @@ public class SelectionDetail
             if (rate > 0)
             {
                 dataToShow.Add(string.Format(Locale.RatingUpWhenSSSp, rate));
+            }
+
+            var playCount = Shim.GetUserScoreList(userData)[difficulty[player]].FirstOrDefault(it => it.id == SelectData.MusicData.name.id)?.playcount ?? 0;
+            if (playCount > 0)
+            {
+                dataToShow.Add(string.Format(Locale.PlayCount, playCount));
             }
 
 
@@ -107,8 +114,7 @@ public class SelectionDetail
         private uint CalcB50(MusicData musicData, int difficulty)
         {
             var newRate = new UserRate(musicData.name.id, difficulty, 1010000, (uint)musicData.version);
-            var user = Singleton<UserDataManager>.Instance.GetUserData(player);
-            var userLowRate = (newRate.OldFlag ? user.RatingList.RatingList : user.RatingList.NewRatingList).Last();
+            var userLowRate = (newRate.OldFlag ? userData.RatingList.RatingList : userData.RatingList.NewRatingList).Last();
 
             if (newRate.SingleRate > userLowRate.SingleRate)
             {
