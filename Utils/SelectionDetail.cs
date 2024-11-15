@@ -113,12 +113,19 @@ public class SelectionDetail
 
         private uint CalcB50(MusicData musicData, int difficulty)
         {
-            var newRate = new UserRate(musicData.name.id, difficulty, 1010000, (uint)musicData.version);
-            var userLowRate = (newRate.OldFlag ? userData.RatingList.RatingList : userData.RatingList.NewRatingList).Last();
+            var theory = new UserRate(musicData.name.id, difficulty, 1010000, (uint)musicData.version);
+            var list = theory.OldFlag ? userData.RatingList.RatingList : userData.RatingList.NewRatingList;
+            var userLowRate = list.Last();
+            var userSongRate = list.FirstOrDefault(it => it.MusicId == musicData.name.id && it.Level == difficulty);
 
-            if (newRate.SingleRate > userLowRate.SingleRate)
+            if (!userSongRate.Equals(default(UserRate)))
             {
-                return newRate.SingleRate - userLowRate.SingleRate;
+                return theory.SingleRate - userSongRate.SingleRate;
+            }
+
+            if (theory.SingleRate > userLowRate.SingleRate)
+            {
+                return theory.SingleRate - userLowRate.SingleRate;
             }
 
             return 0;
