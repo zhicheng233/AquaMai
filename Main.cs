@@ -188,6 +188,10 @@ namespace AquaMai
             Patch(typeof(TestProof));
             Patch(typeof(PractiseMode));
             Patch(typeof(HideSelfMadeCharts));
+            
+            Patch(typeof(SlideFadeInTweak));
+            Patch(typeof(JudgeAccuracyInfo));
+
 # if CI
             Patch(typeof(CiBuildAlert));
 # endif
