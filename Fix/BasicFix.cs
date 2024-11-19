@@ -68,6 +68,15 @@ public class BasicFix
         ServicePointManager.ServerCertificateValidationCallback = null;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MAI2System.Config), "IsTarget")]
+    private static bool ForceNonTarget(ref bool __result)
+    {
+        // Who teaching others to set Target=1?!
+        __result = false;
+        return false;
+    }
+
     public static void DoCustomPatch(HarmonyLib.Harmony h)
     {
         if (typeof(GameManager).GetMethod("CalcSpecialNum") is null) return;
