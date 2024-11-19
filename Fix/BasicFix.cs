@@ -77,6 +77,14 @@ public class BasicFix
         return false;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MAI2System.Config), "IsIgnoreError")]
+    private static bool ForceIgnoreError(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
     public static void DoCustomPatch(HarmonyLib.Harmony h)
     {
         if (typeof(GameManager).GetMethod("CalcSpecialNum") is null) return;
