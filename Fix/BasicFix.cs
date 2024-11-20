@@ -69,7 +69,7 @@ public class BasicFix
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(MAI2System.Config), "IsTarget")]
+    [HarmonyPatch(typeof(MAI2System.Config), "IsTarget", MethodType.Getter)]
     private static bool ForceNonTarget(ref bool __result)
     {
         // Who teaching others to set Target=1?!
@@ -78,7 +78,7 @@ public class BasicFix
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(MAI2System.Config), "IsIgnoreError")]
+    [HarmonyPatch(typeof(MAI2System.Config), "IsIgnoreError", MethodType.Getter)]
     private static bool ForceIgnoreError(ref bool __result)
     {
         __result = true;
