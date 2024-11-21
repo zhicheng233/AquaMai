@@ -68,7 +68,7 @@ public class BasicFix
         ServicePointManager.ServerCertificateValidationCallback = null;
     }
 
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(MAI2System.Config), "IsTarget", MethodType.Getter)]
     private static bool ForceNonTarget(ref bool __result)
     {
@@ -77,7 +77,7 @@ public class BasicFix
         return false;
     }
 
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(MAI2System.Config), "IsIgnoreError", MethodType.Getter)]
     private static bool ForceIgnoreError(ref bool __result)
     {
