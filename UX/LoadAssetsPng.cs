@@ -24,7 +24,9 @@ public class LoadAssetsPng
     private static Dictionary<string, string> framepatternPaths = new();
     private static Dictionary<string, string> iconPaths = new();
     private static Dictionary<string, string> charaPaths = new();
+
     private static Dictionary<string, string> partnerPaths = new();
+
     //private static Dictionary<string, string> navicharaPaths = new();
     private static Dictionary<string, string> tabTitlePaths = new();
     private static Dictionary<string, string> localAssetsContents = new();
@@ -166,6 +168,7 @@ public class LoadAssetsPng
         texture.LoadImage(File.ReadAllBytes(path));
         return texture;
     }
+
     private static string GetPlatePath(string id)
     {
         return platePaths.GetValueOrDefault(id);
@@ -219,6 +222,7 @@ public class LoadAssetsPng
         texture.LoadImage(File.ReadAllBytes(path));
         return texture;
     }
+
     private static string GetIconPath(string id)
     {
         return iconPaths.GetValueOrDefault(id);
@@ -236,6 +240,7 @@ public class LoadAssetsPng
         texture.LoadImage(File.ReadAllBytes(path));
         return texture;
     }
+
     private static string GetCharaPath(string id)
     {
         return charaPaths.GetValueOrDefault(id);
@@ -253,6 +258,7 @@ public class LoadAssetsPng
         texture.LoadImage(File.ReadAllBytes(path));
         return texture;
     }
+
     private static string GetPartnerPath(string id)
     {
         return partnerPaths.GetValueOrDefault(id);
@@ -466,34 +472,24 @@ public class LoadAssetsPng
         }
     }
 
-    [HarmonyPatch]
-    public static class IconLoader
+    // Private | Instance
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AssetManager), "GetIconTexture2D", typeof(string))]
+    public static bool IconLoader(string filename, ref Texture2D __result, AssetManager __instance)
     {
-        public static IEnumerable<MethodBase> TargetMethods()
+        var matches = Regex.Matches(filename, @"UI_Icon_(\d+)\.png");
+        if (matches.Count < 1)
         {
-            var AM = typeof(AssetManager);
-            var method = AM.GetMethod("GetIconTexture2D", new[] { typeof(string) });
-            if (method != null)
-            {
-                yield return method;
-            }
+            return true;
         }
 
-        public static bool Prefix(string filename, ref Texture2D __result, AssetManager __instance)
-        {
-            var matches = Regex.Matches(filename, @"UI_Icon_(\d+)\.png");
-            if (matches.Count < 1)
-            {
-                return true;
-            }
-            MelonLogger.Msg(filename);
-            var id = matches[0].Groups[1].Value;
+        MelonLogger.Msg(filename);
+        var id = matches[0].Groups[1].Value;
 
-            var texture = GetIconTexture2D(id);
-            __result = texture ?? __instance.LoadAsset<Texture2D>($"Icon/UI_Icon_{id}.png");
+        var texture = GetIconTexture2D(id);
+        __result = texture ?? __instance.LoadAsset<Texture2D>($"Icon/UI_Icon_{id}.png");
 
-            return false;
-        }
+        return false;
     }
 
     [HarmonyPatch]
@@ -521,7 +517,7 @@ public class LoadAssetsPng
             return false;
         }
     }
-  
+
     [HarmonyPatch]
     public static class PartnerLoader
     {
