@@ -12,12 +12,12 @@ public class Config
     [ConfigComment(
         en: "Globally increase A judgment, unit is the same as in the game",
         zh: "全局增加 A 判，单位和游戏里一样")]
-    public float JudgeAdjustA { get; set; }
+    public double JudgeAdjustA { get; set; }
 
     [ConfigComment(
         en: "Globally increase B judgment, unit is the same as in the game",
         zh: "全局增加 B 判，单位和游戏里一样")]
-    public float JudgeAdjustB { get; set; }
+    public double JudgeAdjustB { get; set; }
 
     [ConfigComment(
         en: "Touch screen delay, unit is milliseconds, one second = 1000 milliseconds. Must be an integer",

@@ -11,14 +11,14 @@ public class JudgeAdjust
     [HarmonyPatch(typeof(UserOption), "GetAdjustMSec")]
     public static void GetAdjustMSec(ref float __result)
     {
-        __result += AquaMai.AppConfig.Utils.JudgeAdjustA * 16.666666f;
+        __result += (float)AquaMai.AppConfig.Utils.JudgeAdjustA * 16.666666f;
     }
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(UserOption), "GetJudgeTimingFrame")]
     public static void GetJudgeTimingFrame(ref float __result)
     {
-        __result += AquaMai.AppConfig.Utils.JudgeAdjustB;
+        __result += (float)AquaMai.AppConfig.Utils.JudgeAdjustB;
     }
 
     [HarmonyPrefix]
