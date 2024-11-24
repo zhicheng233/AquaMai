@@ -15,11 +15,11 @@ public class ConfigMigrationManager : IConfigMigrationManager
             new ConfigMigration_V1_0_V2_0()
         }.ToDictionary(m => m.FromVersion);
 
-    public readonly string latestVersion;
+    public string LatestVersion { get; }
 
     private ConfigMigrationManager()
     {
-        latestVersion = migrationMap.Values
+        LatestVersion = migrationMap.Values
             .Select(m => m.ToVersion)
             .OrderByDescending(version =>
             {
@@ -39,9 +39,9 @@ public class ConfigMigrationManager : IConfigMigrationManager
             config = migration.Migrate(config);
             currentVersion = migration.ToVersion;
         }
-        if (currentVersion != latestVersion)
+        if (currentVersion != LatestVersion)
         {
-            throw new ArgumentException($"Could not migrate the config from v{currentVersion} to v{latestVersion}");
+            throw new ArgumentException($"Could not migrate the config from v{currentVersion} to v{LatestVersion}");
         }
         return config;
     }

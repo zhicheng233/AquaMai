@@ -31,9 +31,9 @@ public class ConfigParser : IConfigParser
     public void Parse(IConfig config, IConfigView configView)
     {
         var configVersion = ConfigMigrationManager.Instance.GetVersion(configView);
-        if (configVersion != ConfigMigrationManager.Instance.latestVersion)
+        if (configVersion != ConfigMigrationManager.Instance.LatestVersion)
         {
-            throw new InvalidOperationException($"Config version mismatch: expected {ConfigMigrationManager.Instance.latestVersion}, got {configVersion}");
+            throw new InvalidOperationException($"Config version mismatch: expected {ConfigMigrationManager.Instance.LatestVersion}, got {configVersion}");
         }
         Hydrate((Config)config, ((ConfigView)configView).root, "");
     }

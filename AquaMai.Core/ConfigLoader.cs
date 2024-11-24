@@ -46,7 +46,7 @@ public static class ConfigLoader
         var configText = File.ReadAllText(ConfigFile);
         var configView = new ConfigView(configText);
         var configVersion = ConfigMigrationManager.Instance.GetVersion(configView);
-        if (configVersion != ConfigMigrationManager.Instance.latestVersion)
+        if (configVersion != ConfigMigrationManager.Instance.LatestVersion)
         {
             File.WriteAllText(OldConfigFile(configVersion), configText);
             configView = (ConfigView)ConfigMigrationManager.Instance.Migrate(configView);
