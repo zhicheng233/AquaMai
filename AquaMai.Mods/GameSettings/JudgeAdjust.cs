@@ -24,7 +24,7 @@ public class JudgeAdjust
     [ConfigEntry(
         en: "Increase touch delay.",
         zh: "增加触摸延迟")]
-    private static readonly int touchDelay = 0;
+    private static readonly uint touchDelay = 0;
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(UserOption), "GetAdjustMSec")]
@@ -45,6 +45,6 @@ public class JudgeAdjust
     public static void NewTouchPanelRecv()
     {
         if (touchDelay <= 0) return;
-        Thread.Sleep(touchDelay);
+        Thread.Sleep((int)touchDelay);
     }
 }

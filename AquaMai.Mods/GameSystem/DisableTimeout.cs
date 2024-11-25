@@ -14,7 +14,7 @@ namespace AquaMai.Mods.GameSystem;
         Not recommand to enable when SinglePlayer is off.
         """,
     zh: """
-        去除游戏中的倒计时（隐藏并设为 65535 秒）
+        去除并隐藏游戏中的倒计时
         没有开启单人模式时，不建议启用
         """)]
 public class DisableTimeout

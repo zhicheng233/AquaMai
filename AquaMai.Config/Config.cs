@@ -55,6 +55,7 @@ public class Config : IConfig
             {
                 throw new InvalidOperationException($"Null default value for entry {entry.Path} is not allowed.");
             }
+
             entries.Add(entry.Path, new EntryState()
             {
                 IsDefault = true,
@@ -75,6 +76,7 @@ public class Config : IConfig
         {
             throw new ArgumentException($"Type {type.FullName} is not a config section.");
         }
+
         return sections[section.Path];
     }
 
@@ -91,6 +93,11 @@ public class Config : IConfig
 
     public void SetEntryValue(IReflectionManager.IEntry entry, object value)
     {
+        if (value.GetType() != entry.Field.FieldType)
+        {
+            throw new ArgumentException($"Value type {value.GetType().FullName} does not match entry type {entry.Field.FieldType.FullName}.");
+        }
+
         entry.Field.SetValue(null, value);
         entries[entry.Path].IsDefault = false;
         entries[entry.Path].Value = value;

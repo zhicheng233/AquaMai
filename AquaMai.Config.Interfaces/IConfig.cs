@@ -6,7 +6,7 @@ public interface IConfig
 {
     public interface IEntryState
     {
-        public bool IsDefault { get; set; }
+        public bool IsDefault { get; }
         public object DefaultValue { get; }
         public object Value { get; set; }
     }
