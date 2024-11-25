@@ -133,7 +133,7 @@ public class ConfigMigration_V1_0_V2_0 : IConfigMigration
         if (src.GetValueOrDefault<bool>("Fix.ForcePaidPlay"))
         {
             dst.SetValue("GameSettings.CreditConfig.IsFreePlay", false);
-            dst.SetValue("GameSettings.CreditConfig.LockCredits", 24);
+            dst.SetValue("GameSettings.CreditConfig.LockCredits", 24u);
         }
         MapValueToEntryValueIfNonNullOrDefault(src, dst, "Fix.ExtendNotesPool", "Fancy.GamePlay.ExtendNotesPool.Count", 0);
         MapBooleanTrueToSectionEnable(src, dst, "Fix.FrameRateLock", "Tweaks.LockFrameRate");
@@ -159,7 +159,7 @@ public class ConfigMigration_V1_0_V2_0 : IConfigMigration
         MapBooleanTrueToSectionEnable(src, dst, "Utils.LogUserId", "Utils.LogUserId");
         MapValueToEntryValueIfNonNullOrDefault<double>(src, dst, "Utils.JudgeAdjustA", "GameSettings.JudgeAdjust.A", 0);
         MapValueToEntryValueIfNonNullOrDefault<double>(src, dst, "Utils.JudgeAdjustB", "GameSettings.JudgeAdjust.B", 0);
-        MapValueToEntryValueIfNonNullOrDefault(src, dst, "Utils.TouchDelay", "GameSettings.JudgeAdjust.TouchDelay", 0);
+        MapValueToEntryValueIfNonNullOrDefault(src, dst, "Utils.TouchDelay", "GameSettings.JudgeAdjust.TouchDelay", 0u);
         MapBooleanTrueToSectionEnable(src, dst, "Utils.SelectionDetail", "UX.SelectionDetail");
         MapBooleanTrueToSectionEnable(src, dst, "Utils.ShowNetErrorDetail", "Utils.ShowNetErrorDetail");
         MapBooleanTrueToSectionEnable(src, dst, "Utils.ShowErrorLog", "Utils.ShowErrorLog");

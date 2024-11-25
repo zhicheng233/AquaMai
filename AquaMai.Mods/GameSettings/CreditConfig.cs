@@ -25,7 +25,7 @@ public class CreditConfig
     [ConfigEntry(
         en: "Lock credits amount (only valid in Paid Play). Set to 0 to disable.",
         zh: "锁定可用点数数量（仅在付费游玩时有效），设为 0 以禁用")]
-    private static readonly uint lockCredits = 24;
+    private static readonly uint lockCredits = 24u;
 
     private static bool ShouldLockCredits => !isFreePlay && lockCredits > 0;
 
@@ -43,7 +43,7 @@ public class CreditConfig
     [HarmonyPatch(typeof(AMDaemon.CreditUnit), "Credit", MethodType.Getter)]
     private static bool PreCredit(ref uint __result)
     {
-        __result = 24;
+        __result = lockCredits;
         return false;
     }
 }
