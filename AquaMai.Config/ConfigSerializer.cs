@@ -107,7 +107,7 @@ public class ConfigSerializer(IConfigSerializer.Options Options) : IConfigSerial
             {
                 var entryState = config.GetEntryState(entry);
                 AppendComment(sb, entry.Attribute.Comment);
-                if (entry.Attribute.SpecialConfigEntry == SpecialConfigEntry.Locale && Options.OverrideLocaleValue)
+                if (((ConfigEntryAttribute)entry.Attribute).SpecialConfigEntry == SpecialConfigEntry.Locale && Options.OverrideLocaleValue)
                 {
                     AppendEntry(sb, section.Path, entry.Name, Options.Lang);
                 }
@@ -151,7 +151,7 @@ public class ConfigSerializer(IConfigSerializer.Options Options) : IConfigSerial
         }
     }
 
-    private void AppendComment(StringBuilder sb, ConfigComment comment)
+    private void AppendComment(StringBuilder sb, IConfigComment comment)
     {
         if (comment != null)
         {

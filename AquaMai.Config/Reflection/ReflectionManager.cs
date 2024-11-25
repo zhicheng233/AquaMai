@@ -14,14 +14,14 @@ public class ReflectionManager : IReflectionManager
         public string Path { get; init; }
         public string Name { get; init; }
         public IReflectionField Field { get; init; }
-        public ConfigEntryAttribute Attribute { get; init; }
+        public IConfigEntryAttribute Attribute { get; init; }
     }
 
     public record Section : IReflectionManager.ISection
     {
         public string Path { get; init; }
         public IReflectionType Type { get; init; }
-        public ConfigSectionAttribute Attribute { get; init; }
+        public IConfigSectionAttribute Attribute { get; init; }
         public List<Entry> entries;
         public List<IReflectionManager.IEntry> Entries => entries.Cast<IReflectionManager.IEntry>().ToList();
     }

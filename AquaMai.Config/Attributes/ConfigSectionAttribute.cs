@@ -1,4 +1,5 @@
 using System;
+using AquaMai.Config.Interfaces;
 
 namespace AquaMai.Config.Attributes;
 
@@ -12,9 +13,9 @@ public class ConfigSectionAttribute(
     bool defaultOn = false,
     // NOTE: You probably shouldn't use this. Only the "General" section is using this.
     //       Implies defaultOn = true.
-    bool alwaysEnabled = false) : Attribute
+    bool alwaysEnabled = false) : Attribute, IConfigSectionAttribute
 {
-    public ConfigComment Comment { get; } = new ConfigComment(en, zh);
+    public IConfigComment Comment { get; } = new ConfigComment(en, zh);
     public bool ExampleHidden { get; } = exampleHidden;
     public bool DefaultOn { get; } = defaultOn || alwaysEnabled;
     public bool AlwaysEnabled { get; } = alwaysEnabled;

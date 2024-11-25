@@ -10,6 +10,7 @@ public interface IReflectionManager
         public string Path { get; }
         public string Name { get; }
         public IReflectionField Field { get; }
+        public IConfigEntryAttribute Attribute { get; init; }
     }
 
     public interface ISection
@@ -17,6 +18,7 @@ public interface IReflectionManager
         public string Path { get; }
         public IReflectionType Type { get; }
         public List<IEntry> Entries { get; }
+        public IConfigSectionAttribute Attribute { get; init; }
     }
 
     public IEnumerable<ISection> Sections { get; }

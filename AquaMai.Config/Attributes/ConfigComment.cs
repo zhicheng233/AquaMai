@@ -1,8 +1,9 @@
 using System;
+using AquaMai.Config.Interfaces;
 
 namespace AquaMai.Config.Attributes;
 
-public record ConfigComment(string CommentEn, string CommentZh)
+public record ConfigComment(string CommentEn, string CommentZh) : IConfigComment
 {
     public string GetLocalized(string lang) => lang switch
     {

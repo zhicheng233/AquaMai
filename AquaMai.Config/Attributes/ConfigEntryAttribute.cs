@@ -1,4 +1,5 @@
 using System;
+using AquaMai.Config.Interfaces;
 
 namespace AquaMai.Config.Attributes;
 
@@ -16,9 +17,9 @@ public class ConfigEntryAttribute(
     //       Only use it to hide options that really won't be used.
     bool hideWhenDefault = false,
     // NOTE: Use this argument to mark special config entries that need special handling.
-    SpecialConfigEntry specialConfigEntry = SpecialConfigEntry.None) : Attribute
+    SpecialConfigEntry specialConfigEntry = SpecialConfigEntry.None) : Attribute, IConfigEntryAttribute
 {
-    public ConfigComment Comment { get; } = new ConfigComment(en, zh);
+    public IConfigComment Comment { get; } = new ConfigComment(en, zh);
     public bool HideWhenDefault { get; } = hideWhenDefault;
     public SpecialConfigEntry SpecialConfigEntry { get; } = specialConfigEntry;
 }
