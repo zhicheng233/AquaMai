@@ -28,7 +28,7 @@ namespace AquaMai.Core.Resources {
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public Locale() {
+        internal Locale() {
         }
         
         /// <summary>
@@ -161,11 +161,20 @@ namespace AquaMai.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 游玩次数：{0}.
+        ///   Looks up a localized string similar to Play Count：{0}.
         /// </summary>
         public static string PlayCount {
             get {
                 return ResourceManager.GetString("PlayCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlog save error.
+        /// </summary>
+        public static string PlaylogSaveError {
+            get {
+                return ResourceManager.GetString("PlaylogSaveError", resourceCulture);
             }
         }
         
@@ -260,6 +269,24 @@ namespace AquaMai.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hide Self-Made Charts.
+        /// </summary>
+        public static string SelfMadeChartsHide {
+            get {
+                return ResourceManager.GetString("SelfMadeChartsHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Self-Made Charts.
+        /// </summary>
+        public static string SelfMadeChartsShow {
+            get {
+                return ResourceManager.GetString("SelfMadeChartsShow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Skip.
         /// </summary>
         public static string Skip {
@@ -310,6 +337,15 @@ namespace AquaMai.Core.Resources {
         public static string SpeedUp {
             get {
                 return ResourceManager.GetString("SpeedUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UserAll Upsert Error.
+        /// </summary>
+        public static string UserAllUpsertError {
+            get {
+                return ResourceManager.GetString("UserAllUpsertError", resourceCulture);
             }
         }
     }

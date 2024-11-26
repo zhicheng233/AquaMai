@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AquaMai.Config.Attributes;
 using AquaMai.Config.Types;
 using AquaMai.Core.Helpers;
+using AquaMai.Core.Resources;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
@@ -25,8 +26,7 @@ public class HideSelfMadeCharts
         zh: "切换自制谱显示的按键")]
     public static readonly KeyCodeOrName key = KeyCodeOrName.Test;
 
-    [ConfigEntry]
-    public static readonly bool longPress = false;
+    [ConfigEntry] public static readonly bool longPress = false;
 
     [ConfigEntry(
         en: "One user ID per line in the file. Hide self-made charts when these users login.",
@@ -86,7 +86,7 @@ public class HideSelfMadeCharts
         Task.Run(async () =>
         {
             await Task.Delay(1000);
-            MessageHelper.ShowMessage($"{(isShowSelfMadeCharts ? "Show" : "Hide")} Self-Made Charts");
+            MessageHelper.ShowMessage(isShowSelfMadeCharts ? Locale.SelfMadeChartsShow : Locale.SelfMadeChartsHide);
         });
     }
 

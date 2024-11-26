@@ -102,6 +102,18 @@
         <value>You are using AquaMai CI build version. This version is built from the latest mainline code and may contain undocumented configuration changes or potential issues.</value>
     </data>
     <data name="PlayCount" xml:space="preserve">
-        <value>游玩次数：{0}</value>
+        <value>Play Count：{0}</value>
+    </data>
+    <data name="SelfMadeChartsHide" xml:space="preserve">
+        <value>Hide Self-Made Charts</value>
+    </data>
+    <data name="SelfMadeChartsShow" xml:space="preserve">
+        <value>Show Self-Made Charts</value>
+    </data>
+    <data name="UserAllUpsertError" xml:space="preserve">
+        <value>UserAll Upsert Error</value>
+    </data>
+    <data name="PlaylogSaveError" xml:space="preserve">
+        <value>Playlog save error</value>
     </data>
 </root>

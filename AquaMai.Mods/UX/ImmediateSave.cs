@@ -53,6 +53,7 @@ public class ImmediateSave
 
         for (int i = 0; i < 2; i++)
         {
+            var j = i;
             var userData = Singleton<UserDataManager>.Instance.GetUserData(i);
             if (!userData.IsEntry || userData.IsGuest())
             {
@@ -74,10 +75,10 @@ public class ImmediateSave
                 },
                 delegate(PacketStatus err)
                 {
-                    SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, i);
+                    SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, j);
                     MelonLogger.Error("[ImmediateSave] Playlog save error");
                     MelonLogger.Error(err);
-                    MessageHelper.ShowMessage("Playlog save error");
+                    MessageHelper.ShowMessage(Locale.PlaylogSaveError);
                     CheckSaveDone();
                 }));
             PacketHelper.StartPacket(Shim.CreatePacketUpsertUserAll(i, userData, delegate(int code)
@@ -89,18 +90,18 @@ public class ImmediateSave
                 }
                 else
                 {
-                    SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, i);
+                    SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, j);
                     MelonLogger.Error("[ImmediateSave] UserAll upsert error");
                     MelonLogger.Error(code);
-                    MessageHelper.ShowMessage("UserAll upsert error");
+                    MessageHelper.ShowMessage(Locale.UserAllUpsertError);
                     CheckSaveDone();
                 }
             }, delegate(PacketStatus err)
             {
-                SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, i);
+                SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_ENTRY_AIME_ERROR, j);
                 MelonLogger.Error("[ImmediateSave] UserAll upsert error");
                 MelonLogger.Error(err);
-                MessageHelper.ShowMessage("UserAll upsert error");
+                MessageHelper.ShowMessage(Locale.UserAllUpsertError);
                 CheckSaveDone();
             }));
         }
