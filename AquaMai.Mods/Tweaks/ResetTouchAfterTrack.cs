@@ -18,12 +18,4 @@ public class ResetTouchAfterTrack
         SingletonStateMachine<AmManager, AmManager.EState>.Instance.StartTouchPanel();
         MelonLoader.MelonLogger.Msg("[TouchResetAfterTrack] Touch panel reset");
     }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(GamePlayManager), "SetQuickRetryFrag")]
-    public static void OnStart()
-    {
-        SingletonStateMachine<AmManager, AmManager.EState>.Instance.StartTouchPanel();
-        MelonLoader.MelonLogger.Msg("[TouchResetAfterTrack] Touch panel reset");
-    }
 }
