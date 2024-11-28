@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using AquaMai.Config.Attributes;
 using HarmonyLib;
+using MAI2.Util;
 using Manager;
 using Monitor;
 using Monitor.Result;
@@ -123,6 +124,9 @@ public class JudgeAccuracyInfo
     )
     {
         var monitor = __instance.MonitorId;
+        var userData = Singleton<UserDataManager>.Instance.GetUserData(monitor);
+        if(!userData.IsEntry) return;
+        
         if (!__result || EntryList[monitor].NoteIndices.Contains(___NoteIndex)) return;
             
         EntryList[monitor].NoteIndices.Add(___NoteIndex);
