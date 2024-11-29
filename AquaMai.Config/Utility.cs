@@ -21,6 +21,16 @@ public static class Utility
         };
     }
 
+    public static bool IsTrutyOrDefault(TomlValue value, bool defaultValue = false)
+    {
+        return value switch
+        {
+            TomlBoolean boolean => boolean.Value,
+            TomlLong @long => @long.Value != 0,
+            _ => defaultValue
+        };
+    }
+
     public static bool IsIntegerType(Type type)
     {
         return type == typeof(sbyte) || type == typeof(short) || type == typeof(int) || type == typeof(long)
