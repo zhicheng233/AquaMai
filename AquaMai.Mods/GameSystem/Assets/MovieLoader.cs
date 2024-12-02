@@ -56,21 +56,26 @@ public class MovieLoader
 
         if (mp4Exists && _videoPlayer is null)
         {
+            if(_videoPlayer is null)
+            {
 # if DEBUG
-            MelonLogger.Msg("Init _videoPlayer");
+                MelonLogger.Msg("Init _videoPlayer");
+                _videoPlayer = ____movieMaskObj.AddComponent<VideoPlayer>();
 # endif
-            _videoPlayer = ____movieMaskObj.AddComponent<VideoPlayer>();
+            }
+# if DEBUG
+            else
+            {
+                MelonLogger.Msg("_videoPlayer already exists");
+            }
+# endif
             _videoPlayer.url = mp4Path;
             _videoPlayer.playOnAwake = false;
             _videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
             _videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+            // 似乎 MaterialOverride 没法保持视频的长宽比，用 RenderTexture 的话放在 SpriteRenderer 里面会比较麻烦。
+            // 所以就不保持了，在塞 pv 的时候自己转吧，反正原本也要根据 first 加 padding
         }
-# if DEBUG
-        else if (mp4Exists)
-        {
-            MelonLogger.Msg("_videoPlayer already exists");
-        }
-# endif
 
         var components = ____movieMaskObj.GetComponentsInChildren<Component>(false);
         var movies = components.Where(it => it.name == "Movie");
