@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using AquaMai.Config.Attributes;
+using CriMana;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
@@ -122,6 +123,17 @@ public class MovieLoader
             {
                 player.Play();
             }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Player), "SetSpeed")]
+    public static void SetSpeed(float speed)
+    {
+        foreach (var player in _videoPlayers)
+        {
+            if (player == null) return;
+            player.playbackSpeed = speed;
         }
     }
 }
