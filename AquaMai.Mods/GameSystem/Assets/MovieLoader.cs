@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using AquaMai.Config.Attributes;
 using HarmonyLib;
 using MAI2.Util;
@@ -33,11 +32,11 @@ public class MovieLoader
         zh: "从 LocalAssets 中加载 MP4 文件作为 PV")]
     private static bool loadMp4Movie = true;
 
-    private static VideoPlayer _videoPlayer;
+    private static VideoPlayer[] _videoPlayers = new VideoPlayer[2];
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(GameCtrl), "IsReady")]
-    public static void LoadLocalBgaAwake(GameObject ____movieMaskObj)
+    [HarmonyPatch(typeof(GameCtrl), "Initialize")]
+    public static void LoadLocalBgaAwake(GameObject ____movieMaskObj, int ___monitorIndex)
     {
         var music = Singleton<DataManager>.Instance.GetMusic(GameManager.SelectMusicID[0]);
         if (music is null) return;
@@ -54,13 +53,13 @@ public class MovieLoader
             return;
         }
 
-        if (mp4Exists && _videoPlayer is null)
+        if (mp4Exists)
         {
-            if(_videoPlayer is null)
+            if (_videoPlayers[___monitorIndex] is null)
             {
 # if DEBUG
                 MelonLogger.Msg("Init _videoPlayer");
-                _videoPlayer = ____movieMaskObj.AddComponent<VideoPlayer>();
+                _videoPlayers[___monitorIndex] = ____movieMaskObj.AddComponent<VideoPlayer>();
 # endif
             }
 # if DEBUG
@@ -69,44 +68,30 @@ public class MovieLoader
                 MelonLogger.Msg("_videoPlayer already exists");
             }
 # endif
-            _videoPlayer.url = mp4Path;
-            _videoPlayer.playOnAwake = false;
-            _videoPlayer.renderMode = VideoRenderMode.MaterialOverride;
-            _videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+            _videoPlayers[___monitorIndex].url = mp4Path;
+            _videoPlayers[___monitorIndex].playOnAwake = false;
+            _videoPlayers[___monitorIndex].renderMode = VideoRenderMode.MaterialOverride;
+            _videoPlayers[___monitorIndex].audioOutputMode = VideoAudioOutputMode.None;
             // 似乎 MaterialOverride 没法保持视频的长宽比，用 RenderTexture 的话放在 SpriteRenderer 里面会比较麻烦。
             // 所以就不保持了，在塞 pv 的时候自己转吧，反正原本也要根据 first 加 padding
         }
 
-        var components = ____movieMaskObj.GetComponentsInChildren<Component>(false);
-        var movies = components.Where(it => it.name == "Movie");
+        var movie = ____movieMaskObj.transform.Find("Movie");
 
-        foreach (var movie in movies)
+        // If I create a new RawImage component, the jacket will be not be displayed
+        // I think it will be difficult to make it work with RawImage
+        // So I change the material that plays video to default sprite material
+        // The original player is actually a sprite renderer and plays video with a custom material
+        var sprite = movie.GetComponent<SpriteRenderer>();
+        if (mp4Exists)
         {
-# if DEBUG
-            MelonLogger.Msg("Found movie component: " + movie);
-# endif
-            // If I create a new RawImage component, the jacket will be not be displayed
-            // I think it will be difficult to make it work with RawImage
-            // So I change the material that plays video to default sprite material
-            // The original player is actually a sprite renderer and plays video with a custom material
-            var sprite = movie.GetComponent<SpriteRenderer>();
-            if (mp4Exists)
-            {
-                if (_videoPlayer.targetMaterialRenderer == null)
-                {
-                    sprite.material = new Material(Shader.Find("Sprites/Default"));
-                    _videoPlayer.targetMaterialRenderer = sprite;
-                }
-                else
-                {
-                    sprite.material = _videoPlayer.targetMaterialRenderer.material;
-                }
-            }
-            else
-            {
-                sprite.sprite = Sprite.Create(jacket, new Rect(0, 0, jacket.width, jacket.height), new Vector2(0.5f, 0.5f));
-                sprite.material = new Material(Shader.Find("Sprites/Default"));
-            }
+            sprite.material = new Material(Shader.Find("Sprites/Default"));
+            _videoPlayers[___monitorIndex].targetMaterialRenderer = sprite;
+        }
+        else
+        {
+            sprite.sprite = Sprite.Create(jacket, new Rect(0, 0, jacket.width, jacket.height), new Vector2(0.5f, 0.5f));
+            sprite.material = new Material(Shader.Find("Sprites/Default"));
         }
     }
 
@@ -114,23 +99,29 @@ public class MovieLoader
     [HarmonyPatch(typeof(MovieController), "Play")]
     public static void Play(int frame)
     {
-        if (_videoPlayer == null) return;
-        _videoPlayer.frame = frame;
-        _videoPlayer.Play();
+        foreach (var player in _videoPlayers)
+        {
+            if (player == null) return;
+            player.frame = frame;
+            player.Play();
+        }
     }
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(MovieController), "Pause")]
     public static void Pause(bool pauseFlag)
     {
-        if (_videoPlayer == null) return;
-        if (pauseFlag)
+        foreach (var player in _videoPlayers)
         {
-            _videoPlayer.Pause();
-        }
-        else
-        {
-            _videoPlayer.Play();
+            if (player == null) return;
+            if (pauseFlag)
+            {
+                player.Pause();
+            }
+            else
+            {
+                player.Play();
+            }
         }
     }
 }
