@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
 using AquaMai.Config.Attributes;
 using AquaMai.Core.Helpers;
@@ -39,6 +39,23 @@ public class MovieLoader
         zh: "加载 MP4 文件的路径")]
     private static readonly string movieAssetsDir = "LocalAssets";
 
+    private static readonly Dictionary<string, string> optionFileMap = [];
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DataManager), "LoadMusicBase")]
+    public static void LoadMusicPostfix(List<string> ____targetDirs)
+    {
+        foreach (var aDir in ____targetDirs)
+        {
+            if (!Directory.Exists(Path.Combine(aDir, "MovieData"))) continue;
+            var files = Directory.GetFiles(Path.Combine(aDir, "MovieData"), "*.mp4");
+            foreach (var file in files)
+            {
+                optionFileMap[Path.GetFileName(file)] = file;
+            }
+        }
+    }
+
     private static VideoPlayer[] _videoPlayers = new VideoPlayer[2];
 
     [HarmonyPostfix]
@@ -52,7 +69,11 @@ public class MovieLoader
         if (!moviePath.Contains("dummy")) return;
 
         var resolvedDir = FileSystem.ResolvePath(movieAssetsDir);
-        var mp4Path = Path.Combine(resolvedDir, $"{music.movieName.id:000000}.mp4");
+        if (!optionFileMap.TryGetValue($"{music.movieName.id:000000}.mp4", out var mp4Path))
+        {
+            mp4Path = Path.Combine(resolvedDir, $"{music.movieName.id:000000}.mp4");
+        }
+
         var mp4Exists = File.Exists(mp4Path);
         var jacket = LoadLocalImages.GetJacketTexture2D(music.movieName.id);
         if (!mp4Exists && jacket is null)
