@@ -139,4 +139,24 @@ public class ConfigView : IConfigView
     {
         return new ConfigView(ToToml());
     }
+
+    public bool IsSectionEnabled(string path)
+    {
+        if (TryGetValue(path, out object section))
+        {
+            if (section is bool enabled)
+            {
+                return enabled;
+            }
+            else if (section is TomlTable table)
+            {
+                if (Utility.TomlTryGetValueCaseInsensitive(table, "Disabled", out var disabled))
+                {
+                    return !Utility.IsTrutyOrDefault(disabled);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -13,17 +13,27 @@ using UnityEngine.Video;
 namespace AquaMai.Mods.GameSystem.Assets;
 
 [ConfigSection(
-    en: """
-        Use the png jacket above as MV if no .dat found in the movie folder.
-        Use together with `LoadLocalImages`.
-        """,
-    zh: """
-        如果 movie 文件夹中没有 dat 格式的 MV 的话，就用歌曲的封面做背景，而不是显示迪拉熊的笑脸
-        请和 `LoadLocalImages` 一起用
-        """)]
-public class UseJacketAsDummyMovie
+    en: "Use mp4 files or the png jacket above as PV if no .dat found in the movie folder.",
+    zh: "使用封面作为 PV 以及直读 MP4 格式 PV 的选项")]
+public class MovieLoader
 {
-    private static VideoPlayer _videoPlayer = null;
+    [ConfigEntry(
+        en: """
+            Use jacket as movie
+            Use together with `LoadLocalImages`.
+            """,
+        zh: """
+            用封面作为背景 PV
+            请和 `LoadLocalImages` 一起用
+            """)]
+    private static bool jacketAsMovie = true;
+
+    [ConfigEntry(
+        en: "Load MP4 files from LocalAssets",
+        zh: "从 LocalAssets 中加载 MP4 文件作为 PV")]
+    private static bool loadMp4Movie = true;
+
+    private static VideoPlayer _videoPlayer;
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameCtrl), "IsReady")]
