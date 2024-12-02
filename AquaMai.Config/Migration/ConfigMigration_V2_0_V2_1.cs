@@ -13,32 +13,12 @@ public class ConfigMigration_V2_0_V2_1 : IConfigMigration
         var dst = src.Clone();
         dst.SetValue("Version", ToVersion);
 
-        if (IsSectionEnabled(src, "Tweaks.ResetTouchAfterTrack"))
+        if (src.IsSectionEnabled("Tweaks.ResetTouchAfterTrack"))
         {
             dst.Remove("Tweaks.ResetTouchAfterTrack");
             dst.SetValue("Tweaks.ResetTouch.AfterTrack", true);
         }
 
         return dst;
-    }
-
-    public bool IsSectionEnabled(IConfigView src, string path)
-    {
-        if (src.TryGetValue(path, out object section))
-        {
-            if (section is bool enabled)
-            {
-                return enabled;
-            }
-            else if (section is TomlTable table)
-            {
-                if (Utility.TomlTryGetValueCaseInsensitive(table, "Disabled", out var disabled))
-                {
-                    return !Utility.IsTrutyOrDefault(disabled);
-                }
-                return true;
-            }
-        }
-        return false;
     }
 }
