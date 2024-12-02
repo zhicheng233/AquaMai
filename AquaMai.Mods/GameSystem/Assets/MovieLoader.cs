@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using AquaMai.Config.Attributes;
+using AquaMai.Core.Helpers;
 using CriMana;
 using HarmonyLib;
 using MAI2.Util;
@@ -33,6 +34,11 @@ public class MovieLoader
         zh: "从 LocalAssets 中加载 MP4 文件作为 PV")]
     private static bool loadMp4Movie = true;
 
+    [ConfigEntry(
+        en: "MP4 files directory",
+        zh: "加载 MP4 文件的路径")]
+    private static readonly string movieAssetsDir = "LocalAssets";
+
     private static VideoPlayer[] _videoPlayers = new VideoPlayer[2];
 
     [HarmonyPostfix]
@@ -45,7 +51,8 @@ public class MovieLoader
         var moviePath = Singleton<OptionDataManager>.Instance.GetMovieDataPath($"{music.movieName.id:000000}") + ".dat";
         if (!moviePath.Contains("dummy")) return;
 
-        var mp4Path = Path.Combine(Environment.CurrentDirectory, "LocalAssets", $"{music.movieName.id:000000}.mp4");
+        var resolvedDir = FileSystem.ResolvePath(movieAssetsDir);
+        var mp4Path = Path.Combine(resolvedDir, $"{music.movieName.id:000000}.mp4");
         var mp4Exists = File.Exists(mp4Path);
         var jacket = LoadLocalImages.GetJacketTexture2D(music.movieName.id);
         if (!mp4Exists && jacket is null)

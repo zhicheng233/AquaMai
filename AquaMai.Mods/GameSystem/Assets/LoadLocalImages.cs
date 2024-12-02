@@ -20,7 +20,7 @@ namespace AquaMai.Mods.GameSystem.Assets;
 public class LoadLocalImages
 {
     [ConfigEntry]
-    private static readonly string localAssetsDir = "LocalAssets";
+    private static readonly string imageAssetsDir = "LocalAssets";
 
     private static readonly string[] imageExts = [".jpg", ".png", ".jpeg"];
     private static readonly Dictionary<string, string> jacketPaths = [];
@@ -122,7 +122,7 @@ public class LoadLocalImages
 
         MelonLogger.Msg($"[LoadLocalImages] Loaded {jacketPaths.Count} Jacket, {platePaths.Count} NamePlate, {framePaths.Count} Frame, {framemaskPaths.Count} FrameMask, {framepatternPaths.Count} FramePattern, {iconPaths.Count} Icon, {charaPaths.Count} Chara, {partnerPaths.Count} PartnerLogo, {tabTitlePaths.Count} Tab Titles from AssetBundleImages.");
 
-        var resolvedDir = FileSystem.ResolvePath(localAssetsDir);
+        var resolvedDir = FileSystem.ResolvePath(imageAssetsDir);
         if (Directory.Exists(resolvedDir))
             foreach (var laFile in Directory.EnumerateFiles(resolvedDir))
             {

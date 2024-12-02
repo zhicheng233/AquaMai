@@ -19,6 +19,12 @@ public class ConfigMigration_V2_1_V2_2 : IConfigMigration
             dst.SetValue("GameSystem.Assets.MovieLoader.JacketAsMovie", true);
         }
 
+        if (src.TryGetValue<string>("GameSystem.Assets.LoadLocalImages.LocalAssetsDir", out var localAssetsDir))
+        {
+            dst.SetValue("GameSystem.Assets.LoadLocalImages.ImageAssetsDir", localAssetsDir);
+            dst.Remove("GameSystem.Assets.LoadLocalImages.LocalAssetsDir");
+        }
+
         return dst;
     }
 }
