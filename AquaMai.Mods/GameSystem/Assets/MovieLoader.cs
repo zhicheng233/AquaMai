@@ -60,8 +60,8 @@ public class MovieLoader
             {
 # if DEBUG
                 MelonLogger.Msg("Init _videoPlayer");
-                _videoPlayers[___monitorIndex] = ____movieMaskObj.AddComponent<VideoPlayer>();
 # endif
+                _videoPlayers[___monitorIndex] = ____movieMaskObj.AddComponent<VideoPlayer>();
             }
 # if DEBUG
             else
@@ -102,7 +102,7 @@ public class MovieLoader
     {
         foreach (var player in _videoPlayers)
         {
-            if (player == null) return;
+            if (player == null) continue;
             player.frame = frame;
             player.Play();
         }
@@ -114,7 +114,7 @@ public class MovieLoader
     {
         foreach (var player in _videoPlayers)
         {
-            if (player == null) return;
+            if (player == null) continue;
             if (pauseFlag)
             {
                 player.Pause();
@@ -132,7 +132,7 @@ public class MovieLoader
     {
         foreach (var player in _videoPlayers)
         {
-            if (player == null) return;
+            if (player == null) continue;
             player.playbackSpeed = speed;
         }
     }
