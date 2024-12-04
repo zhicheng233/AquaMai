@@ -37,6 +37,20 @@ public class Unlock
     }
 
     [ConfigEntry(
+        en: "Unlock all songs (Same as setting AllOpen=1 in mai2.ini).",
+        zh: "解锁所有乐曲（和 mai2.ini 里面设置 AllOpen=1 是一样的效果）")]
+    private static readonly bool songs = true;
+
+    [EnableIf(nameof(songs))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(MAI2System.Config), "IsAllOpen", MethodType.Getter)]
+    public static bool IsAllOpen(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
+    [ConfigEntry(
         en: "Unlock normally event-only tickets.",
         zh: "解锁游戏里所有可能的跑图券")]
     private static readonly bool tickets = true;
