@@ -51,32 +51,37 @@ public class SinglePlayer
         return false;
     }
 
-    [EnableGameVersion(21500, noWarn: true)]
-    public class SkipTimer
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(EntryMonitor), "DecideEntry")]
-        public static void PostDecideEntry(EntryMonitor __instance)
-        {
-# if DEBUG
-            MelonLogger.Msg("Confirm Entry");
-# endif
-            TimeManager.MarkGameStartTime();
-            Singleton<EventManager>.Instance.UpdateEvent();
-            Singleton<ScoreRankingManager>.Instance.UpdateData();
-            __instance.Process.CreateDownloadProcess();
-            __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 30001));
-            __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 40000, 0, OperationInformationController.InformationType.Hide));
-            __instance.Process.SetNextProcess();
-        }
+    [ConfigEntry(
+        en: "Automatically skip the countdown when logging in with a card in single-player mode.",
+        zh: "单人模式下刷卡登录直接进入下一个界面，无需跳过倒计时")]
+    public static bool autoSkip = true;
 
-        // To prevent the "長押受付終了" overlay from appearing
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(WaitPartner), "Open")]
-        public static bool WaitPartnerPreOpen()
-        {
-            return false;
-        }
+    [EnableGameVersion(21500, noWarn: true)]
+    [EnableIf(nameof(autoSkip))]
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(EntryMonitor), "DecideEntry")]
+    public static void PostDecideEntry(EntryMonitor __instance)
+    {
+# if DEBUG
+        MelonLogger.Msg("Confirm Entry");
+# endif
+        TimeManager.MarkGameStartTime();
+        Singleton<EventManager>.Instance.UpdateEvent();
+        Singleton<ScoreRankingManager>.Instance.UpdateData();
+        __instance.Process.CreateDownloadProcess();
+        __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 30001));
+        __instance.ProcessManager.SendMessage(new Message(ProcessType.CommonProcess, 40000, 0, OperationInformationController.InformationType.Hide));
+        __instance.Process.SetNextProcess();
+    }
+
+    // To prevent the "長押受付終了" overlay from appearing
+    [EnableGameVersion(21500, noWarn: true)]
+    [EnableIf(nameof(autoSkip))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(WaitPartner), "Open")]
+    public static bool WaitPartnerPreOpen()
+    {
+        return false;
     }
 
     [ConfigEntry(
