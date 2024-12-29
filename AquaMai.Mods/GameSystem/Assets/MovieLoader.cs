@@ -84,7 +84,7 @@ public class MovieLoader
 
         if (mp4Exists)
         {
-            if (_videoPlayers[___monitorIndex] is null)
+            if (_videoPlayers[___monitorIndex] == null)
             {
 # if DEBUG
                 MelonLogger.Msg("Init _videoPlayer");
