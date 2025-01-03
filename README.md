@@ -1,8 +1,20 @@
-## AquaMai
+# AquaMai
 
 This mod is heavily WIP. More details will be added as the development progresses.
 
-### Features
+## Installation
+
+1. Build the project or find an existing build somewhere™
+2. Download [MelonLoader.x64.zip](https://github.com/LavaGang/MelonLoader/releases/download/v0.6.1/MelonLoader.x64.zip) **v0.6.1** (important!)
+3. Extract MelonLoader zip to where your Sinmai.exe is
+4. Make a Mods folder and put AquaMai.dll inside it
+5. Pet your cat
+6. Launch!
+
+> [!WARNING]
+> MelonLoader must be version 0.6.1 or lower. Higher versions will crash due to an incompatibility in `mono-2.0-bdwgc.dll`
+
+## Features
 
 **Cheats**
 
@@ -26,7 +38,7 @@ This mod is heavily WIP. More details will be added as the development progresse
 
 * Speed up things
 
-### Development
+## Development
 
 1. Copy `Assembly-CSharp.dll` to `Libs` folder.
 2. Install [.NET Framework 4.7.2 Developer Pack](https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net472-developer-pack-offline-installer)
@@ -35,7 +47,7 @@ This mod is heavily WIP. More details will be added as the development progresse
 5. Copy `Output/AquaMai.dll` to `Mods` folder.
 6. Configure and copy `AquaMai.toml` to the same folder as your game executable: `Sinmai.exe`
 
-### Relevant Links
+## Relevant Links
 
 * [MelonLoader Wiki](https://melonwiki.xyz/#/modders/quickstart)
 * [Harmony Docs](https://harmony.pardeike.net/articles/patching-prefix.html)
