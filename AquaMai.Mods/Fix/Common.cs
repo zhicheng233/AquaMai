@@ -136,4 +136,16 @@ public class Common
             return false;
         }
     }
+
+    [ConfigEntry]
+    private readonly static bool enableAllEvent = true;
+
+    [EnableIf(nameof(enableAllEvent))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(EventManager), "IsOpenEvent")]
+    private static bool EnableAllEvent(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
 }
