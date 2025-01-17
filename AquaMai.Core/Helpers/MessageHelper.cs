@@ -3,7 +3,6 @@ using HarmonyLib;
 using Manager;
 using MelonLoader;
 using Process;
-using UnityEngine;
 
 namespace AquaMai.Core.Helpers;
 
@@ -18,7 +17,7 @@ public class MessageHelper
         _genericManager = genericManager;
     }
 
-    public static void ShowMessage(string message, WindowSizeID size = WindowSizeID.Middle, string title = null, Sprite sprite = null)
+    public static void ShowMessage(string message, WindowSizeID size = WindowSizeID.Middle, string title = null)
     {
         if (_genericManager is null)
         {
@@ -35,8 +34,6 @@ public class MessageHelper
             text = message,
             changeSize = true,
             sizeID = size,
-            directSprite = sprite is not null,
-            sprite = sprite,
         });
     }
 }
