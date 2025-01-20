@@ -1,4 +1,6 @@
-﻿using AquaMai.Config.Attributes;
+﻿using System.Collections;
+using AquaMai.Config.Attributes;
+using AquaMai.Core.Helpers;
 using DB;
 using HarmonyLib;
 using MAI2.Util;
@@ -15,12 +17,6 @@ namespace AquaMai.Mods.Tweaks.TimeSaving;
     zh: "登录完成后直接进入选歌界面")]
 public class EntryToMusicSelection
 {
-    private static int[] _timers = new int[2];
-
-    private static CommonValue[] _volumeFadeIns = { new CommonValue(), new CommonValue() };
-
-    private static readonly bool[] _volumeFadeInState = new bool[2];
-
     /*
      * Highly experimental, may well break some stuff
      * Works by overriding the info screen (where it shows new events and stuff)
@@ -32,6 +28,7 @@ public class EntryToMusicSelection
     public static bool OnUpdate(InformationProcess __instance, ProcessDataContainer ___container)
     {
         GameManager.SetMaxTrack();
+        SharedInstances.GameMainObject.StartCoroutine(GraduallyIncreaseHeadphoneVolumeCoroutine());
         ___container.processManager.AddProcess(new MusicSelectProcess(___container));
         ___container.processManager.ReleaseProcess(__instance);
         return false;
@@ -48,22 +45,40 @@ public class EntryToMusicSelection
     }
 
     // Gradually increase headphone volume
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(MusicSelectProcess), "OnUpdate")]
-    public static void MusicSelectProcessOnUpdate()
+    private static IEnumerator GraduallyIncreaseHeadphoneVolumeCoroutine()
     {
+        CommonValue[] _volumeFadeIns = [null, null];
+
         for (var i = 0; i < 2; i++)
         {
-            if (_volumeFadeInState[i] && _timers[i] == 0) continue;
-
-            if (_timers[i] > 0)
+            var userData = UserDataManager.Instance.GetUserData(i);
+            if (!userData.IsEntry) continue;
+            _volumeFadeIns[i] = new CommonValue();
+            var value = userData.Option.HeadPhoneVolume.GetValue();
+            if (GameManager.IsSelectContinue[i])
             {
-                _timers[i]--;
+                _volumeFadeIns[i].start = value;
+                _volumeFadeIns[i].current = value;
+            }
+            else
+            {
+                _volumeFadeIns[i].start = 0.05f;
+                _volumeFadeIns[i].current = 0.05f;
             }
 
-            if (_volumeFadeInState[i])
+            _volumeFadeIns[i].end = value;
+            _volumeFadeIns[i].diff = (_volumeFadeIns[i].end - _volumeFadeIns[i].start) / 90f;
+        }
+
+        yield return null;
+
+
+        for (var timer = 90; timer >= 0; timer--)
+        {
+            for (var i = 0; i < 2; i++)
             {
-                if (_timers[i] == 0)
+                if (_volumeFadeIns[i] == null) continue;
+                if (timer == 0)
                 {
                     SoundManager.SetHeadPhoneVolume(i, _volumeFadeIns[i].end);
                 }
@@ -72,37 +87,8 @@ public class EntryToMusicSelection
                     SoundManager.SetHeadPhoneVolume(i, _volumeFadeIns[i].current);
                 }
             }
-            else
-            {
-                var userData = UserDataManager.Instance.GetUserData(i);
-                if (!userData.IsEntry) continue;
-                var value = userData.Option.HeadPhoneVolume.GetValue();
-                if (GameManager.IsSelectContinue[i])
-                {
-                    _volumeFadeIns[i].start = value;
-                    _volumeFadeIns[i].current = value;
-                }
-                else
-                {
-                    _volumeFadeIns[i].start = 0.05f;
-                    _volumeFadeIns[i].current = 0.05f;
-                }
 
-                _volumeFadeIns[i].end = value;
-                _volumeFadeIns[i].diff = (_volumeFadeIns[i].end - _volumeFadeIns[i].start) / 90f;
-                _timers[i] = 90;
-                _volumeFadeInState[i] = true;
-            }
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(GameOverProcess), "OnStart")]
-    public static void GameOverProcessOnStart()
-    {
-        for (var i = 0; i < 2; i++)
-        {
-            _volumeFadeInState[i] = false;
+            yield return null;
         }
     }
 }
