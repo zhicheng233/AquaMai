@@ -51,11 +51,11 @@ jobs:
           path: Output\Upload
 
       - name: Send to Telegram
-#        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
         run: |
           $Uri = "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMediaGroup"
           $Form = @{
-            chat_id = "351768429"
+            chat_id = "-1002231087502"
             media = @(
               @{ type = "document"; media = "attach://aquamai_main"; caption = "${{ env.GIT_DESCRIBE }}`n${{ github.event.commits[0].message }}" },
               @{ type = "document"; media = "attach://aquamai_zh" }
