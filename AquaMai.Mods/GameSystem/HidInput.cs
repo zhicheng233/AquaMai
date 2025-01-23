@@ -40,11 +40,6 @@ public class HidInput
                 if (report2P.Status == HidDeviceData.ReadStatus.Success)
                     inputBuf2P = report2P.Data;
             }
-
-#if DEBUG
-            MelonLogger.Msg("[HidInput] 1P: " + string.Join(",", inputBuf1P));
-#endif
-            // Thread.Sleep(10); // Sleep for a short time to avoid CPU overload
         }
     }
 
