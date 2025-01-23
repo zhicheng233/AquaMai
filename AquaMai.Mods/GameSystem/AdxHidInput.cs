@@ -14,7 +14,7 @@ namespace AquaMai.Mods.GameSystem;
 [ConfigSection(
     en: "Input using ADX HID firmware (do not enable if you are not using ADX's HID firmware, be sure to delete the existing HID related DLL when enabled)",
     zh: "使用 ADX HID 固件的自定义输入（如果你没有使用 ADX 的 HID 固件，请不要启用。启用时请务必删除现有 HID 相关 DLL）")]
-public class HidInput
+public class AdxHidInput
 {
     private static HidDevice adxController1P = null;
     private static HidDevice adxController2P = null;
