@@ -22,6 +22,7 @@ public class AquaMai : MelonMod
         {
             coreBuildInfo.GetField(field.Name)?.SetValue(null, field.GetValue(null));
         }
+        coreBuildInfo.GetField("ModAssembly")?.SetValue(null, MelonAssembly);
     }
 
     private static MethodInfo onGUIMethod;
