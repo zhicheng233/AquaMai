@@ -157,7 +157,8 @@ public class Unlock
                 // Trigger a manual silent unlock check.
                 if (!GameManager.IsEventMode)
                 {
-                    GameScoreList gameScore = GamePlayManager.Instance.GetGameScore(i);
+                    int trackNo = GamePlayManager.Instance.GetScoreListCount();
+                    GameScoreList gameScore = GamePlayManager.Instance.GetGameScore(i, trackNo - 1);
                     int musicId = gameScore.SessionInfo.musicId;
                     if (gameScore.SessionInfo.difficulty >= 2 &&
                         musicId >= 10000 && musicId < 20000 &&
