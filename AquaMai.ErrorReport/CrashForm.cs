@@ -104,6 +104,28 @@ public partial class CrashForm : Form
             await CreateZipTxtFromDirContent(zip, Path.Combine(gameDir, "Mods"), true);
             await CreateZipTxtFromDirContent(zip, Path.Combine(gameDir, "UserLibs"));
             await CreateZipTxtFromDirContent(zip, Path.Combine(gameDir, "LocalAssets"));
+            await CreateZipTxtFromDirContent(zip, gameDir, true);
+
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "AquaMai.toml"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "mai2.ini"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "segatools.ini"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "daemon/segatools.ini"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../AMDaemon/segatools.ini"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "DEVICE/aime.txt"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "daemon/DEVICE/aime.txt"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../AMDaemon/DEVICE/aime.txt"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "start.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "start.cmd"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "启动.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "启动.cmd"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "！启动.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "！启动.cmd"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../start.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../start.cmd"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../启动.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../启动.cmd"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../！启动.bat"));
+            AddFileToZipIfExist(zip, Path.Combine(gameDir, "../！启动.cmd"));
 
             var melonLog = Path.Combine(gameDir, "MelonLoader", "Latest.log");
             if (File.Exists(melonLog))
@@ -148,6 +170,14 @@ public partial class CrashForm : Form
         timer = new Timer { Interval = 50 };
         timer.Tick += Tick;
         timer.Start();
+    }
+
+    private static void AddFileToZipIfExist(ZipArchive zip, string file)
+    {
+        if (File.Exists(file))
+        {
+            zip.CreateEntryFromFile(file, Path.GetFileName(file));
+        }
     }
 
     private static byte[] AppendFileHeaderMetaToBuffer(byte[] data, FileHeaderMeta meta)
