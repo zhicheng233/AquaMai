@@ -134,7 +134,15 @@ public class SelectionDetail
         {
             var theory = new UserRate(musicData.name.id, difficulty, 1010000, (uint)musicData.version);
             var list = theory.OldFlag ? userData.RatingList.RatingList : userData.RatingList.NewRatingList;
-            var userLowRate = list.Last();
+            var maxCount = theory.OldFlag ? 35 : 15;
+
+            uint userLowRate = 0;
+            if (list.Count == maxCount)
+            {
+                var rate = list.Last();
+                userLowRate = rate.SingleRate;
+            }
+
             var userSongRate = list.FirstOrDefault(it => it.MusicId == musicData.name.id && it.Level == difficulty);
 
             if (!userSongRate.Equals(default(UserRate)))
@@ -142,9 +150,9 @@ public class SelectionDetail
                 return theory.SingleRate - userSongRate.SingleRate;
             }
 
-            if (theory.SingleRate > userLowRate.SingleRate)
+            if (theory.SingleRate > userLowRate)
             {
-                return theory.SingleRate - userLowRate.SingleRate;
+                return theory.SingleRate - userLowRate;
             }
 
             return 0;
