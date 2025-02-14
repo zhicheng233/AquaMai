@@ -33,7 +33,7 @@ public class PostBuildPatch : Task
     {
         foreach (var resource in assembly.MainModule.Resources.ToList())
         {
-            if (resource.Name.EndsWith(".dll") && resource is EmbeddedResource embeddedResource)
+            if ((resource.Name.EndsWith(".dll") || resource.Name.EndsWith(".exe")) && resource is EmbeddedResource embeddedResource)
             {
                 using var compressedStream = new MemoryStream();
                 using (var deflateStream = new DeflateStream(compressedStream, CompressionLevel.Optimal))

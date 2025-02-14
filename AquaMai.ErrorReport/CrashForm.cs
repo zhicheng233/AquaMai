@@ -40,15 +40,6 @@ public partial class CrashForm : Form
 
     private async void CrashForm_Load(object sender, EventArgs e)
     {
-        try
-        {
-            labelVersion.Text = "AquaMai v" + FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
-        }
-        catch
-        {
-            labelVersion.Text = "AquaMai (Version Unknown)";
-        }
-
         labelStatus.Text = "正在生成错误报告... Gathering error log...";
         var exePath = Path.GetDirectoryName(Application.ExecutablePath);
         var gameDir = Path.GetDirectoryName(exePath);
@@ -67,6 +58,15 @@ public partial class CrashForm : Form
         if (!Directory.Exists(errorLogPath))
         {
             Directory.CreateDirectory(errorLogPath);
+        }
+
+        try
+        {
+            labelVersion.Text = "AquaMai v" + FileVersionInfo.GetVersionInfo(Path.Combine(gameDir, "Mods", "AquaMai.dll")).ProductVersion;
+        }
+        catch
+        {
+            labelVersion.Text = "AquaMai (Version Unknown)";
         }
 
         try

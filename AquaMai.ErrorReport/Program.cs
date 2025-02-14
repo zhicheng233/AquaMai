@@ -1,9 +1,8 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace AquaMai.ErrorReport;
 
-public class Main
+public class Program
 {
     [DllImport("SHCore.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -18,18 +17,12 @@ public class Main
         PER_MONITOR_AWARE = 2
     }
 
-    public static void Start()
+    [STAThread]
+    public static void Main()
     {
-        AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         SetProcessDpiAwareness(DPI_AWARENESS.SYSTEM_AWARE);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new CrashForm());
-    }
-
-    // 这是魔法
-    private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-    {
-        return Assembly.GetExecutingAssembly();
     }
 }

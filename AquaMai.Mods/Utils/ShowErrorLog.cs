@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Threading;
 using AquaMai.Config.Attributes;
@@ -35,6 +36,7 @@ public class ShowErrorLog
             _errorUi = new GameObject("ErrorUI").AddComponent<Ui>();
             _errorUi.gameObject.SetActive(true);
         }
+
         string logFile = $"{MAI2System.Path.ErrorLogPath}{DateTime.Now:yyyyMMddHHmmss}.log";
         MelonLogger.Msg("Error Log:");
         if (File.Exists(logFile))
@@ -66,21 +68,39 @@ public class ShowErrorLog
 
     public static void ApplicationOnQuittingNew()
     {
+        var path = Path.Combine(Path.GetTempPath(), DateTime.Now.Ticks.ToString());
+        using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+        {
+            using var s = GetErrorReporterStream();
+            s.CopyTo(fs);
+        }
+
         MelonLogger.Msg("Starting Crash Handler...");
         var psi = new ProcessStartInfo
         {
-            FileName = BuildInfo.ModAssembly.Location,
-            Arguments = "ErrorReport",
+            FileName = path,
             WorkingDirectory = Path.GetDirectoryName(Application.dataPath),
             UseShellExecute = false,
         };
         System.Diagnostics.Process.Start(psi);
     }
 
+    private static Stream GetErrorReporterStream()
+    {
+        var s = BuildInfo.ModAssembly.Assembly.GetManifestResourceStream("AquaMai.ErrorReport.exe");
+        if (s != null)
+        {
+            return s;
+        }
+
+        s = BuildInfo.ModAssembly.Assembly.GetManifestResourceStream("AquaMai.ErrorReport.exe.compressed");
+        return new DeflateStream(s, CompressionMode.Decompress);
+    }
+
     private class Ui : MonoBehaviour
     {
         private string _errorLog = "";
-        
+
         public void SetErrorLog(string text)
         {
             _errorLog = "Error Log:\n" + text;
@@ -92,14 +112,14 @@ public class ShowErrorLog
             {
                 fontSize = GuiSizes.FontSize,
                 alignment = TextAnchor.MiddleLeft,
-                normal = new GUIStyleState(){textColor = Color.black}
+                normal = new GUIStyleState() { textColor = Color.black }
             };
 
             var boxStyle = new GUIStyle(GUI.skin.box)
             {
                 normal = new GUIStyleState() { background = Texture2D.whiteTexture }
             };
-            
+
             int logLineCount = Regex.Matches(_errorLog, "\n").Count + 1;
             float offset = GuiSizes.PlayerCenter * 0.12f;
             var x = GuiSizes.PlayerCenter / 2f + offset / 2f;
@@ -115,7 +135,7 @@ public class ShowErrorLog
                 GUI.Label(new Rect(x + GuiSizes.PlayerWidth, y, width, height), _errorLog, labelStyle);
             }
         }
-        
+
         public IEnumerator Show()
         {
             while (true)
