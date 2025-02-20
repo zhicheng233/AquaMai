@@ -66,7 +66,7 @@ public class DisableTimeout
     [EnableIf(nameof(inGameStart))]
     public static bool ModeSelectProcessUpdateInput(ModeSelectProcess __instance)
     {
-        if (!InputManager.GetButtonDown(0, InputManager.ButtonSetting.Button05)) return true;
+        if (!InputManager.GetMonitorButtonDown(InputManager.ButtonSetting.Button05)) return true;
         __instance.TimeSkipButtonAnim(InputManager.ButtonSetting.Button05);
         SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_SYS_SKIP, 0);
         Traverse.Create(__instance).Method("TimeUp").GetValue();
@@ -77,9 +77,17 @@ public class DisableTimeout
     [HarmonyPatch(typeof(PhotoEditProcess), "MainMenuUpdate")]
     public static void PhotoEditProcess(PhotoEditMonitor[] ____monitors, PhotoEditProcess __instance)
     {
-        if (!InputManager.GetButtonDown(0, InputManager.ButtonSetting.Button04)) return;
-        SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_SYS_SKIP, 0);
-        ____monitors[0].SetButtonPressed(InputManager.ButtonSetting.Button04);
+        if (!InputManager.GetMonitorButtonDown(InputManager.ButtonSetting.Button04)) return;
+        try
+        {
+            SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_SYS_SKIP, 0);
+            ____monitors[0].SetButtonPressed(InputManager.ButtonSetting.Button04);
+        }
+        catch
+        {
+            // ignored
+        }
+
         Traverse.Create(__instance).Method("OnTimeUp").GetValue();
     }
 
