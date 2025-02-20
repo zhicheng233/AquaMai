@@ -16,11 +16,11 @@ namespace AquaMai.Mods.UX;
 [ConfigSection(
     defaultOn: true,
     en: """
-        Show announcement from the AquaDX server
+        Show announcement from compatible server
         (no side effects for other servers, no extra requests made)
         """,
     zh: """
-        显示来自 AquaDX 服务端的公告
+        显示来自兼容服务端的公告
         （对其他服务器无副作用，不会发出额外请求）
         """)]
 public static class ServerAnnouncement
@@ -30,6 +30,7 @@ public static class ServerAnnouncement
         [CanBeNull] public string title = null;
         [CanBeNull] public string announcement = null;
         [CanBeNull] public string imageUrl = null;
+        public float imageSizeFactor = 9;
         public bool showOnIdle = false;
         public bool showOnUserLogin = false;
         public string[] locales = [];
@@ -105,18 +106,20 @@ public static class ServerAnnouncement
             MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: AquaMai version {aquaMaiVersion} < {announcement.minimumAquaMaiVersion}");
             return false;
         }
+
         if (announcement.maximumAquaMaiVersion != null && aquaMaiVersion > new System.Version(announcement.maximumAquaMaiVersion))
         {
             MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: AquaMai version {aquaMaiVersion} > {announcement.maximumAquaMaiVersion}");
             return false;
         }
-        
+
         var gameVersion = GameInfo.GameVersion;
         if (announcement.minimumGameVersion != 0 && gameVersion < announcement.minimumGameVersion)
         {
             MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: Game version {gameVersion} < {announcement.minimumGameVersion}");
             return false;
         }
+
         if (announcement.maximumGameVersion != 0 && gameVersion > announcement.maximumGameVersion)
         {
             MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: Game version {gameVersion} > {announcement.maximumGameVersion}");
@@ -145,7 +148,7 @@ public static class ServerAnnouncement
             else
             {
                 var texture = DownloadHandlerTexture.GetContent(www);
-                _sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), texture.width / 4f);
+                _sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), texture.width / _announcement.imageSizeFactor);
 #if DEBUG
                 MelonLogger.Msg($"[ServerAnnouncement] Downloaded image success");
 #endif
