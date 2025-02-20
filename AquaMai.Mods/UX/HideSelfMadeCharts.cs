@@ -22,6 +22,11 @@ namespace AquaMai.Mods.UX;
 public class HideSelfMadeCharts
 {
     [ConfigEntry(
+        en: "Hide self-made charts by default when login.",
+        zh: "登录时默认隐藏自制谱")]
+    public static readonly bool defaultHide = false;
+
+    [ConfigEntry(
         en: "Key to toggle self-made charts.",
         zh: "切换自制谱显示的按键")]
     public static readonly KeyCodeOrName key = KeyCodeOrName.Test;
@@ -131,6 +136,6 @@ public class HideSelfMadeCharts
     public static void EntryProcessOnStart(ref EntryProcess __instance)
     {
         // reset status on login
-        isShowSelfMadeCharts = true;
+        isShowSelfMadeCharts = !defaultHide;
     }
 }
