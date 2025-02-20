@@ -78,14 +78,17 @@ public class DisableTimeout
     public static void PhotoEditProcess(PhotoEditMonitor[] ____monitors, PhotoEditProcess __instance)
     {
         if (!InputManager.GetMonitorButtonDown(InputManager.ButtonSetting.Button04)) return;
-        try
+        SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_SYS_SKIP, 0);
+        for (var i = 0; i < 2; i++)
         {
-            SoundManager.PlaySE(Mai2.Mai2Cue.Cue.SE_SYS_SKIP, 0);
-            ____monitors[0].SetButtonPressed(InputManager.ButtonSetting.Button04);
-        }
-        catch
-        {
-            // ignored
+            try
+            {
+                ____monitors[i].SetButtonPressed(InputManager.ButtonSetting.Button04);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         Traverse.Create(__instance).Method("OnTimeUp").GetValue();
