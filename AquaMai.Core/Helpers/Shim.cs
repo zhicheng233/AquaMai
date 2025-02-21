@@ -89,6 +89,35 @@ public static class Shim
         }
     }
 
+    public static byte[] EncryptNetPacketBody(byte[] data)
+    {
+        var methods = AccessTools.TypeByName("Net.CipherAES").GetMethods();
+        var method = methods.FirstOrDefault(it => it.Name == "Encrypt" && it.GetParameters().Length <= 2);
+        if (method == null)
+        {
+            MelonLogger.Warning("No matching Net.CipherAES.Encrypt() method found");
+            // Assume encryption code is removed.
+            return data;
+        }
+        if (method.GetParameters().Length == 1)
+        {
+            return (byte[])method.Invoke(null, [data]);
+        }
+        else
+        {
+            object[] args = [data, null];
+            var result = (bool)method.Invoke(null, args);
+            if (result)
+            {
+                return (byte[])args[1];
+            }
+            else
+            {
+                throw new Exception("Net.CipherAES.Encrypt() failed");
+            }
+        }
+    }
+
     public delegate string GetAccessTokenMethod(int index);
     public static readonly GetAccessTokenMethod GetAccessToken = Iife<GetAccessTokenMethod>(() =>
     {

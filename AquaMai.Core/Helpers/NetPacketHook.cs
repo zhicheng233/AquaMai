@@ -56,10 +56,14 @@ public class NetPacketHook
                     !JsonHelper.DeepEqual(responseJson, JSON.Load(decodedResponse)))
                 {
                     var modifiedResponse = Encoding.UTF8.GetBytes(responseJson.ToJSON());
+                    if (!Shim.NetHttpClientDecryptsResponse)
+                    {
+                        modifiedResponse = Shim.EncryptNetPacketBody(modifiedResponse);
+                    }
                     memoryStream.SetLength(0);
                     memoryStream.Write(modifiedResponse, 0, modifiedResponse.Length);
                     memoryStream.Seek(0, SeekOrigin.Begin);
-                    MelonLogger.Msg($"[NetPacketExtension] Modified response for {api} ({decodedResponse.Length} bytes -> {modifiedResponse.Length} bytes)");
+                    MelonLogger.Msg($"[NetPacketExtension] Modified response for {api} ({decryptedResponse.Length} bytes -> {modifiedResponse.Length} bytes)");
                 }
             }
         }
