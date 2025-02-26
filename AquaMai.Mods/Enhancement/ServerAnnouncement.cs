@@ -2,6 +2,7 @@
 using System.Linq;
 using AquaMai.Config.Attributes;
 using AquaMai.Core.Helpers;
+using AquaMai.Mods.Types;
 using DB;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -11,10 +12,11 @@ using Process;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace AquaMai.Mods.UX;
+namespace AquaMai.Mods.Enhancement;
 
 [ConfigSection(
     defaultOn: true,
+    exampleHidden: true,
     en: """
         Show announcement from compatible server
         (no side effects for other servers, no extra requests made)
@@ -25,7 +27,7 @@ namespace AquaMai.Mods.UX;
         """)]
 public static class ServerAnnouncement
 {
-    private class ServerAnnouncementEntry
+    private class ServerAnnouncementEntry : ConditionalMessage
     {
         [CanBeNull] public string title = null;
         [CanBeNull] public string announcement = null;
@@ -33,11 +35,7 @@ public static class ServerAnnouncement
         public float imageSizeFactor = 9;
         public bool showOnIdle = false;
         public bool showOnUserLogin = false;
-        public string[] locales = [];
-        [CanBeNull] public string minimumAquaMaiVersion = null;
-        [CanBeNull] public string maximumAquaMaiVersion = null;
-        public int minimumGameVersion = 0;
-        public int maximumGameVersion = 0;
+        public bool persistent = false;
     }
 
     private class ServerAnnouncementData
@@ -64,7 +62,7 @@ public static class ServerAnnouncement
         ServerAnnouncementEntry chosenAnnouncement = null;
         foreach (var entry in serverAnnouncementData.entries)
         {
-            if (ShouldShowAnnouncement(entry))
+            if (entry.ShouldShow())
             {
                 chosenAnnouncement = entry;
                 break;
@@ -90,43 +88,6 @@ public static class ServerAnnouncement
         _announcement = chosenAnnouncement;
 
         return null;
-    }
-
-    private static bool ShouldShowAnnouncement(ServerAnnouncementEntry announcement)
-    {
-        if (announcement.locales != null && announcement.locales.Length != 0 && !announcement.locales.Contains(General.locale))
-        {
-            MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: Language {General.locale} not in {JSON.Dump(announcement.locales)}");
-            return false;
-        }
-
-        var aquaMaiVersion = new System.Version(Core.BuildInfo.Version);
-        if (announcement.minimumAquaMaiVersion != null && aquaMaiVersion < new System.Version(announcement.minimumAquaMaiVersion))
-        {
-            MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: AquaMai version {aquaMaiVersion} < {announcement.minimumAquaMaiVersion}");
-            return false;
-        }
-
-        if (announcement.maximumAquaMaiVersion != null && aquaMaiVersion > new System.Version(announcement.maximumAquaMaiVersion))
-        {
-            MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: AquaMai version {aquaMaiVersion} > {announcement.maximumAquaMaiVersion}");
-            return false;
-        }
-
-        var gameVersion = GameInfo.GameVersion;
-        if (announcement.minimumGameVersion != 0 && gameVersion < announcement.minimumGameVersion)
-        {
-            MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: Game version {gameVersion} < {announcement.minimumGameVersion}");
-            return false;
-        }
-
-        if (announcement.maximumGameVersion != 0 && gameVersion > announcement.maximumGameVersion)
-        {
-            MelonLogger.Msg($"[ServerAnnouncement] Now showing announcement: Game version {gameVersion} > {announcement.maximumGameVersion}");
-            return false;
-        }
-
-        return true;
     }
 
     private class DownloadTexture : MonoBehaviour
@@ -163,7 +124,7 @@ public static class ServerAnnouncement
     private static void AdvertiseProcessOnStart()
     {
         if (_announcement == null || !_announcement.showOnIdle) return;
-        MessageHelper.ShowMessage(_announcement.announcement, title: _announcement.title, sprite: _sprite, size: WindowSizeID.LargeVerticalPostImage);
+        MessageHelper.ShowMessage(_announcement.announcement, title: _announcement.title, sprite: _sprite, size: WindowSizeID.LargeVerticalPostImage, retain: _announcement.persistent);
     }
 
     [HarmonyPatch(typeof(EntryProcess), "OnStart")]

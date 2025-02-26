@@ -38,5 +38,6 @@ public enum SectionNameOrder
     Tweaks_TimeSaving,
     UX,
     Utils,
-    Fancy
+    Fancy,
+    Enhancement,
 }
