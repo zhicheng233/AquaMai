@@ -1,4 +1,6 @@
-﻿using AquaMai.Config.Attributes;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using AquaMai.Config.Attributes;
 using HarmonyLib;
 using Process;
 using static Manager.InputManager;
@@ -38,6 +40,37 @@ public class TouchToButtonInput
         else if (button.ToString().Equals("Select"))
         {
             __result = GetTouchPanelAreaLongPush(monitorId, TouchPanelArea.C1, 500L) || GetTouchPanelAreaLongPush(monitorId, TouchPanelArea.C2, 500L);
+        }
+    }
+
+    [HarmonyPatch]
+    public static class GetMonitorButtonDown
+    {
+        public static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.Method(typeof(Manager.InputManager), "GetMonitorButtonDown", [typeof(int).MakeByRefType(), typeof(ButtonSetting)]);
+        }
+
+        public static void Postfix(ref bool __result, ref int monitorId, ButtonSetting button)
+        {
+            if (_isPlaying || __result) return;
+            for (int i = 0; i < 2; i++)
+            {
+                if (button.ToString().StartsWith("Button"))
+                {
+                    __result = GetTouchPanelAreaDown(i, (TouchPanelArea)button);
+                }
+                else if (button.ToString().Equals("Select"))
+                {
+                    __result = GetTouchPanelAreaLongPush(i, TouchPanelArea.C1, 500L) || GetTouchPanelAreaLongPush(i, TouchPanelArea.C2, 500L);
+                }
+
+                if (__result)
+                {
+                    monitorId = i;
+                    break;
+                }
+            }
         }
     }
 
