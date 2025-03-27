@@ -21,6 +21,38 @@ public class DebugFeature
     private static object _debugFeatureOriginal;
     private static System.Type _debugFeatureType;
 
+    private static void GameMoviePause(bool pause)
+    {
+        var method = _gameMovie.GetType().GetMethod("Pause");
+        if (method.GetParameters().Length == 1)
+        {
+            method.Invoke(_gameMovie, [pause]);
+        }
+        else
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                method.Invoke(_gameMovie, [i, pause]);
+            }
+        }
+    }
+
+    private static void GameMovieSetSeekFrame(double msec)
+    {
+        var method = _gameMovie.GetType().GetMethod("SetSeekFrame");
+        if (method.GetParameters().Length == 1)
+        {
+            method.Invoke(_gameMovie, [msec]);
+        }
+        else
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                method.Invoke(_gameMovie, [i, msec]);
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(GameProcess), "OnStart")]
     [HarmonyPostfix]
     public static void Init(GameProcess __instance, MovieController ____gameMovie, GameMonitor[] ____monitors)
@@ -72,7 +104,7 @@ public class DebugFeature
             }
 
             SoundManager.PauseMusic(value);
-            _gameMovie.Pause(value);
+            GameMoviePause(value);
             NotesManager.Pause(value);
         }
     }
@@ -134,7 +166,7 @@ public class DebugFeature
 
         public static void DebugTimeSkip(int addMsec)
         {
-            _gameMovie.Pause(pauseFlag: true);
+            GameMoviePause(true);
             NotesManager.Pause(true);
             if (addMsec >= 0)
             {
@@ -145,7 +177,7 @@ public class DebugFeature
                 timer = timer + addMsec >= 0.0 ? timer + addMsec : 0.0;
             }
 
-            _gameMovie.SetSeekFrame(timer);
+            GameMovieSetSeekFrame(timer);
             SoundManager.SeekMusic((int)timer);
             for (int i = 0; i < _monitors.Length; i++)
             {
@@ -158,11 +190,11 @@ public class DebugFeature
             if (!isPause)
             {
                 SoundManager.PauseMusic(pause: false);
-                _gameMovie.Pause(pauseFlag: false);
+                GameMoviePause(false);
             }
             else
             {
-                _gameMovie.Pause(pauseFlag: true);
+                GameMoviePause(true);
             }
 
             _gameProcess.UpdateNotes();
@@ -187,7 +219,7 @@ public class DebugFeature
             {
                 isPause = !isPause;
                 SoundManager.PauseMusic(isPause);
-                _gameMovie.Pause(isPause);
+                GameMoviePause(isPause);
                 NotesManager.Pause(isPause);
             }
             else if (DebugInput.GetKeyDown(KeyCode.LeftArrow) || DebugInput.GetKeyDown(KeyCode.RightArrow))
