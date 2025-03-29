@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AquaMai.Config.Attributes;
 using AquaMai.Core.Attributes;
 using AquaMai.Core.Helpers;
@@ -27,21 +28,21 @@ namespace AquaMai.Mods.UX;
     zh: "打完一首歌的时候立即向服务器保存成绩")]
 public class ImmediateSave
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(StateULUserAime), "RequestUploadUserPlayLogData")]
-    public static bool PreRequestUploadUserPlayLogData(StateULUserAime __instance)
+    [HarmonyPatch]
+    public static class RequestUploadUserPlayLogMaybeListData
     {
-        Traverse.Create(__instance).Method("RequestUploadUserPortraitData").GetValue();
-        return false;
-    }
+        public static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.Method(typeof(StateULUserAime), "RequestUploadUserPlayLogData");
+            var list = AccessTools.Method(typeof(StateULUserAime), "RequestUploadUserPlayLogListData");
+            if (list != null) yield return list;
+        }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(StateULUserAime), "RequestUploadUserPlayLogListData")]
-    [EnableGameVersion(25000)]
-    public static bool PreRequestUploadUserPlayLogListData(StateULUserAime __instance)
-    {
-        Traverse.Create(__instance).Method("RequestUploadUserPortraitData").GetValue();
-        return false;
+        public static bool Prefix(StateULUserAime __instance)
+        {
+            Traverse.Create(__instance).Method("RequestUploadUserPortraitData").GetValue();
+            return false;
+        }
     }
 
     private static SavingUi ui;
