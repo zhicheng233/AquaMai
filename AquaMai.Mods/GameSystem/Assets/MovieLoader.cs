@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using AquaMai.Config.Attributes;
+using AquaMai.Core.Attributes;
 using AquaMai.Core.Helpers;
 using CriMana;
 using HarmonyLib;
 using MAI2.Util;
 using Manager;
 using MelonLoader;
+using Monitor;
 using Monitor.Game;
 using UnityEngine;
 using UnityEngine.Video;
@@ -160,6 +162,17 @@ public class MovieLoader
             sprite.material = new Material(Shader.Find("Sprites/Default"));
             bgaSize = [1080, 1080];
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(GameMonitor), "SetMovieMaterial")]
+    [EnableGameVersion(minVersion: 15500)]
+    public static bool SetMovieMaterial(Material material, int ___monitorIndex)
+    {
+# if DEBUG
+        MelonLogger.Msg("SetMovieMaterial");
+# endif
+        return _videoPlayers[___monitorIndex] == null;
     }
 
     [HarmonyPostfix]
