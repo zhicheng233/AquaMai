@@ -63,11 +63,13 @@ public class MovieLoader
     }
 
     private static VideoPlayer[] _videoPlayers = new VideoPlayer[2];
+    private static bool _isReplaced = false;
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameCtrl), "Initialize")]
     public static void LoadLocalBgaAwake(GameObject ____movieMaskObj, int ___monitorIndex)
     {
+        _isReplaced = false;
         var music = Singleton<DataManager>.Instance.GetMusic(GameManager.SelectMusicID[0]);
         if (music is null) return;
         
@@ -103,6 +105,8 @@ public class MovieLoader
             MelonLogger.Msg($"[MovieLoader] No jacket or bga for {music.movieName.id:000000}");
             return;
         }
+        
+        _isReplaced = true;
 
         if (mp4Exists)
         {
@@ -172,7 +176,7 @@ public class MovieLoader
 # if DEBUG
         MelonLogger.Msg("SetMovieMaterial");
 # endif
-        return _videoPlayers[___monitorIndex] == null;
+        return !_isReplaced;
     }
 
     [HarmonyPostfix]
