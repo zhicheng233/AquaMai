@@ -17,6 +17,11 @@ public class Window
     private static readonly bool windowed = false;
 
     [ConfigEntry(
+        en: "Borderless window.",
+        zh: "无边框窗口")]
+    private static readonly bool borderless = false;
+
+    [ConfigEntry(
         en: """
             Window width (and height) for windowed mode, rendering resolution for fullscreen mode.
             If set to 0, windowed mode will remember the user-set size, fullscreen mode will use the current display resolution.
@@ -33,7 +38,9 @@ public class Window
     private static readonly int height = 0;
 
     private const int GWL_STYLE = -16;
-    private const int WS_WHATEVER = 0x14CF0000;
+    private const uint WS_WHATEVER = 0x14CF0000;
+    private const uint WS_VISIBLE = 0x10000000;    
+    private const uint WS_POPUP = 0x80000000;
 
     private static IntPtr hwnd = IntPtr.Zero;
 
@@ -61,7 +68,7 @@ public class Window
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(3000);
+                    await Task.Delay(2000);
                     // Screen.SetResolution has delay
                     SetResizeable();
                 });
@@ -78,7 +85,14 @@ public class Window
     public static void SetResizeable()
     {
         if (hwnd == IntPtr.Zero) return;
-        SetWindowLongPtr(hwnd, GWL_STYLE, WS_WHATEVER);
+        if (borderless)
+        {
+            SetWindowLongPtr(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        }
+        else
+        {
+            SetWindowLongPtr(hwnd, GWL_STYLE, WS_WHATEVER);
+        }
     }
 
     private delegate bool EnumThreadDelegate(IntPtr hwnd, IntPtr lParam);
@@ -103,5 +117,5 @@ public class Window
     }
 
     [DllImport("user32.dll")]
-    static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, int dwNewLong);
+    static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, uint dwNewLong);
 }
