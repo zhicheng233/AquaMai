@@ -15,7 +15,7 @@ public class Triggers
         en: "Execute some command on game idle.",
         zh: """
             在游戏闲置的时候执行指定的命令脚本
-            比如说可以在游戏闲置是降低显示器的亮度
+            比如说可以在游戏闲置时降低显示器的亮度
             """)]
     private static readonly string execOnIdle = "";
 
