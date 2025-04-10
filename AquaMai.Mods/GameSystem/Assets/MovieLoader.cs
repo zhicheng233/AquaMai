@@ -29,7 +29,7 @@ public class MovieLoader
     [ConfigEntry(
         en: "Load Movie from LocalAssets mp4 files",
         zh: "从 LocalAssets 中加载 MP4 文件作为 PV")]
-    private static bool loadMp4Movie = false; // default false
+    private static bool loadMp4Movie = true;
 
 
     [ConfigEntry(
@@ -41,7 +41,7 @@ public class MovieLoader
     [ConfigEntry(
         en: "Use jacket as movie\nUse together with `LoadLocalImages`.",
         zh: "用封面作为背景 PV\n请和 `LoadLocalImages` 一起用")]
-    private static bool jacketAsMovie = false; // default false
+    private static bool jacketAsMovie = true;
 
 
     private static readonly Dictionary<string, string> optionFileMap = [];
@@ -170,7 +170,7 @@ public class MovieLoader
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(GameMonitor), "SetMovieMaterial")]
-    [EnableGameVersion(minVersion: 15500)]
+    [EnableGameVersion(minVersion: 25500)]
     public static bool SetMovieMaterial(Material material, int ___monitorIndex)
     {
 # if DEBUG
