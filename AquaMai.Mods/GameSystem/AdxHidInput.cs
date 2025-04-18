@@ -30,14 +30,14 @@ public class AdxHidInput
             if (adxController1P != null)
             {
                 var report1P = adxController1P.Read();
-                if (report1P.Status == HidDeviceData.ReadStatus.Success)
+                if (report1P.Status == HidDeviceData.ReadStatus.Success && report1P.Data.Length > 13)
                     inputBuf1P = report1P.Data;
             }
 
             if (adxController2P != null)
             {
                 var report2P = adxController2P.Read();
-                if (report2P.Status == HidDeviceData.ReadStatus.Success)
+                if (report2P.Status == HidDeviceData.ReadStatus.Success && report2P.Data.Length > 13)
                     inputBuf2P = report2P.Data;
             }
         }

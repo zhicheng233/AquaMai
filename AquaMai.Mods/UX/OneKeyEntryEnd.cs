@@ -28,7 +28,11 @@ public class OneKeyEntryEnd
     {
         if (!KeyListener.GetKeyDownOrLongPress(key, longPress)) return;
         MelonLogger.Msg("[QuickSkip] Activated");
+        DoQuickSkip();
+    }
 
+    public static void DoQuickSkip()
+    {
         var traverse = Traverse.Create(SharedInstances.ProcessDataContainer.processManager);
         var processList = traverse.Field("_processList").GetValue<LinkedList<ProcessManager.ProcessControle>>();
 
@@ -43,6 +47,8 @@ public class OneKeyEntryEnd
                 case "Process.LoginBonus.LoginBonusProcess":
                 case "Process.RegionalSelectProcess":
                 case "Process.CharacterSelectProcess":
+                // Typo in Assembly-CSharp
+                case "Process.CharacterSelectProces":
                 case "Process.TicketSelect.TicketSelectProcess":
                     processToRelease = process.Process;
                     break;
