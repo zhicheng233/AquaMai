@@ -1,9 +1,10 @@
-﻿using AMDaemon.Allnet;
+﻿using System;
+using System.Text.RegularExpressions;
+using AMDaemon.Allnet;
 using AquaMai.Config.Attributes;
 using HarmonyLib;
 using Manager;
 using Manager.Operation;
-using MelonLoader;
 
 namespace AquaMai.Mods.Fix;
 
@@ -30,6 +31,18 @@ public class FixCheckAuth
             {
                 ____operationData.ServerUri = Auth.GameServerUri.Replace("http://", "https://");
             }
+            else if (upgradePort.IsMatch(Auth.GameServerHost))
+            {
+                var match = upgradePort.Match(Auth.GameServerHost);
+                var builder = new UriBuilder(Auth.GameServerUri)
+                {
+                    Port = int.Parse(match.Groups[1].Value),
+                    Scheme = Uri.UriSchemeHttps,
+                };
+                ____operationData.ServerUri = builder.ToString();
+            }
         }
     }
+
+    private static readonly Regex upgradePort = new Regex(@"_AquaMai_UpgradPort_(\d+)_", RegexOptions.Compiled);
 }
