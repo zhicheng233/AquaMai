@@ -12,6 +12,9 @@ namespace AquaMai.Mods.Utils;
     zh: "奇妙的防掉帧，如果你有莫名其妙的掉帧，可以试试这个")]
 public class AntiLag : MonoBehaviour
 {
+    [ConfigEntry(zh: "游戏未取得焦点时也运行")]
+    private static readonly bool activateWhileBackground = false;
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameMainObject), "Awake")]
     public static void OnGameMainObjectAwake()
@@ -34,7 +37,7 @@ public class AntiLag : MonoBehaviour
 
     private void OnTimer()
     {
-        if (!Application.isFocused) return;
+        if (!Application.isFocused && !activateWhileBackground) return;
 #if DEBUG
         MelonLogger.Msg("[AntiLag] Trigger");
 #endif
