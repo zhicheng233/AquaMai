@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using AquaMai.Config.Attributes;
 using AquaMai.Config.Types;
+using AquaMai.Core;
 using AquaMai.Core.Helpers;
+using AquaMai.Mods.Tweaks.TimeSaving;
 using HarmonyLib;
 using Mai2.Mai2Cue;
 using Main;
@@ -57,7 +59,16 @@ public class OneKeyEntryEnd
                     // Skip to save
                     SoundManager.PreviewEnd();
                     SoundManager.PlayBGM(Cue.BGM_COLLECTION, 2);
-                    SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process, new UnlockMusicProcess(SharedInstances.ProcessDataContainer)));
+                    if (ConfigLoader.Config.GetSectionState(typeof(ExitToSave)).Enabled)
+                    {
+                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process, new DataSaveProcess(SharedInstances.ProcessDataContainer)));
+                        // Fix crash
+                        SharedInstances.ProcessDataContainer.processManager.PrepareTimer(0, 0, false, null, false);
+                    }
+                    else
+                    {
+                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process, new UnlockMusicProcess(SharedInstances.ProcessDataContainer)));
+                    }
                     break;
             }
         }
