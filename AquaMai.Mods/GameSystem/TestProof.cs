@@ -50,6 +50,11 @@ public class TestProof
         }
     }
 
+    [ConfigEntry(
+        en: "Change it to a value other than Test to enable long pressing of a specific key to enter the game test mode, so that the Test key can be fully used to implement custom functions",
+        zh: "修改为 Test 以外的值来实现长按特定的键进入游戏测试模式，这样 Test 键就可以完全用来实现自定义功能了")]
+    private static readonly KeyCodeOrName testKey = KeyCodeOrName.Test;
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "GetSystemInputDown")]
     public static bool GetSystemInputDown(ref bool __result, InputManager.SystemButtonSetting button, bool[] ___SystemButtonDown)
@@ -63,7 +68,7 @@ public class TestProof
 
         if (stackFrames.Any(it => it.GetMethod().Name == "DMD<Main.GameMainObject::Update>"))
         {
-            __result = KeyListener.GetKeyDownOrLongPress(KeyCodeOrName.Test, true);
+            __result = KeyListener.GetKeyDownOrLongPress(testKey, true);
         }
 
         return false;
