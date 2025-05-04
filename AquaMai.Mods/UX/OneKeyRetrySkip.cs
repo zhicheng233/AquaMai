@@ -37,7 +37,7 @@ public class OneKeyRetrySkip
             traverse.Method("SetRelease").GetValue();
         }
 
-        if (KeyListener.GetKeyDownOrLongPress(retryKey, retryLongPress) && GameInfo.GameVersion >= 23000)
+        else if (KeyListener.GetKeyDownOrLongPress(retryKey, retryLongPress) && GameInfo.GameVersion >= 23000)
         {
             // This is original typo in Assembly-CSharp
             Singleton<GamePlayManager>.Instance.SetQuickRetryFrag(flag: true);
