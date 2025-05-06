@@ -10,7 +10,10 @@ namespace AquaMai.Mods.UX;
 
 [ConfigSection(
     en: "Disable button LED when not playing",
-    zh: "“一闪一闪的 闪的我心发慌”")]
+    zh: """
+        在游戏闲置时关闭外键和框体的灯光
+        “一闪一闪的 闪的我心发慌”
+        """)]
 public static class DisableLightOutGame
 {
     [HarmonyPrefix]
