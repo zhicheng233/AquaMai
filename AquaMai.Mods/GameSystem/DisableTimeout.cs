@@ -23,6 +23,11 @@ public class DisableTimeout
         zh: "也移除刷卡和选择模式界面的倒计时")]
     private static readonly bool inGameStart = true;
 
+    [ConfigEntry(
+        en: "Hide the timer display.",
+        zh: "隐藏计时器")]
+    private static readonly bool hideTimer = true;
+
     private static bool CheckInGameStart()
     {
         if (inGameStart) return false;
@@ -43,11 +48,21 @@ public class DisableTimeout
         second = 65535;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TimerController), "PrepareTimer")]
+    public static void PostPrepareTimer(TimerController __instance)
+    {
+        if (hideTimer) return;
+        if (CheckInGameStart()) return;
+        Traverse.Create(__instance).Property<bool>("IsInfinity").Value = true;
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CommonTimer), "SetVisible")]
     public static void CommonTimerSetVisible(ref bool isVisible)
     {
         if (CheckInGameStart()) return;
+        if (!hideTimer) return;
         isVisible = false;
     }
 
