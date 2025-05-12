@@ -105,6 +105,26 @@ public class Common
         return false;
     }
 
+    [ConfigEntry] private readonly static bool forceNonReporting = true;
+
+    [EnableIf(nameof(forceNonReporting))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AMDaemon.Allnet.Accounting), nameof(AMDaemon.Allnet.Accounting.IsReporting), MethodType.Getter)]
+    private static bool PreIsReporting(ref bool __result)
+    {
+        __result = false;
+        return false;
+    }
+
+    [EnableIf(nameof(forceNonReporting))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AMDaemon.EMoney), nameof(AMDaemon.EMoney.IsReporting), MethodType.Getter)]
+    private static bool PreEMoneyIsReporting(ref bool __result)
+    {
+        __result = false;
+        return false;
+    }
+
     [ConfigEntry] private readonly static bool forceIgnoreError = true;
 
     [EnableIf(nameof(forceIgnoreError))]
