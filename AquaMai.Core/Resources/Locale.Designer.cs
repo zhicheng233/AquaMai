@@ -152,6 +152,27 @@ namespace AquaMai.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Did you double-click Sinmai.exe directly? That&apos;s not how it works. There should be something called &quot;start.bat&quot; or &quot;启动.bat&quot;, and you need to use it to start.
+        ///Check if your AMDaemon is still alive (look for a command line window called AMDaemon.exe running in the background).
+        ///If the window has disappeared, then there might be some issues with your configuration. Please check your segatools.ini carefully.
+        ///Maybe the window is there, but it&apos;s constantly scrolling errors. If that&apos;s the case, then there might als [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string NoAmDaemonAlertMessage {
+            get {
+                return ResourceManager.GetString("NoAmDaemonAlertMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Black screen, huh? Why?.
+        /// </summary>
+        public static string NoAmDaemonAlertTitle {
+            get {
+                return ResourceManager.GetString("NoAmDaemonAlertTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No camera detected.
         /// </summary>
         public static string NoCamera {

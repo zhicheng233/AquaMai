@@ -118,4 +118,14 @@
     <data name="NoCamera" xml:space="preserve">
         <value>没有找到任何摄像头</value>
     </data>
+    <data name="NoAmDaemonAlertMessage" xml:space="preserve">
+        <value>你是不是直接双击了 Sinmai.exe？这样是不行的，应该有一个东西叫做“启动.bat”或者“start.bat”，你需要用它来启动
+检查一下，你的 AMDaemon 还活着吗（看看有没有一个叫做 AMDaemon.exe 的命令行窗口在后台跑着）
+如果窗口消失了的话，那大概是你在配置上有一些问题，仔细检查一下你的 segatools.ini 吧
+也许窗口是在的，但是上面在不断滚动错误。如果是这样的话那大概也是配置有一些问题
+可以尝试自己解决一下。如果不行的话…那就问问群友或者身边会的人吧</value>
+    </data>
+    <data name="NoAmDaemonAlertTitle" xml:space="preserve">
+        <value>黑屏，是吗？为什么呢？</value>
+    </data>
 </root>

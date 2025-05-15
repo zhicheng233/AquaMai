@@ -125,4 +125,14 @@
     <data name="NoCamera" xml:space="preserve">
         <value>No camera detected</value>
     </data>
+    <data name="NoAmDaemonAlertTitle" xml:space="preserve">
+        <value>Black screen, huh? Why?</value>
+    </data>
+    <data name="NoAmDaemonAlertMessage" xml:space="preserve">
+        <value>Did you double-click Sinmai.exe directly? That's not how it works. There should be something called "start.bat" or "启动.bat", and you need to use it to start.
+Check if your AMDaemon is still alive (look for a command line window called AMDaemon.exe running in the background).
+If the window has disappeared, then there might be some issues with your configuration. Please check your segatools.ini carefully.
+Maybe the window is there, but it's constantly scrolling errors. If that's the case, then there might also be some configuration issues.
+You can try to solve it yourself. If not, then ask your friends in the community or someone nearby who knows how to fix it.</value>
+    </data>
 </root>

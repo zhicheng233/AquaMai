@@ -42,6 +42,9 @@ public class OneKeyEntryEnd
 
         foreach (ProcessManager.ProcessControle process in processList)
         {
+#if DEBUG
+            MelonLogger.Msg($"[QuickSkip] {process.Process}");
+#endif
             switch (process.Process.ToString())
             {
                 // After login
@@ -61,13 +64,15 @@ public class OneKeyEntryEnd
                     SoundManager.PlayBGM(Cue.BGM_COLLECTION, 2);
                     if (ConfigLoader.Config.GetSectionState(typeof(ExitToSave)).Enabled)
                     {
-                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process, new DataSaveProcess(SharedInstances.ProcessDataContainer)));
+                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process,
+                            new DataSaveProcess(SharedInstances.ProcessDataContainer)));
                         // Fix crash
                         SharedInstances.ProcessDataContainer.processManager.PrepareTimer(0, 0, false, null, false);
                     }
                     else
                     {
-                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process, new UnlockMusicProcess(SharedInstances.ProcessDataContainer)));
+                        SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, process.Process,
+                            new UnlockMusicProcess(SharedInstances.ProcessDataContainer)));
                     }
                     break;
             }
@@ -76,7 +81,8 @@ public class OneKeyEntryEnd
         if (processToRelease != null)
         {
             GameManager.SetMaxTrack();
-            SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, processToRelease, new MusicSelectProcess(SharedInstances.ProcessDataContainer)));
+            SharedInstances.ProcessDataContainer.processManager.AddProcess(new FadeProcess(SharedInstances.ProcessDataContainer, processToRelease,
+                new MusicSelectProcess(SharedInstances.ProcessDataContainer)));
         }
     }
 }
