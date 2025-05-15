@@ -158,18 +158,6 @@ public class Common
         }
     }
 
-    [ConfigEntry] private readonly static bool enableAllEvent = true;
-
-    [EnableIf(nameof(enableAllEvent))]
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(EventManager), "IsOpenEvent")]
-    private static bool EnableAllEvent(ref bool __result, int eventId)
-    {
-        if (eventId > 0)
-            __result = true;
-        return false;
-    }
-
     [EnableGameVersion(25000)]
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(WarningProcess), "OnStart")]

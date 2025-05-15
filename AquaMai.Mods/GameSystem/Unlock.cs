@@ -319,6 +319,22 @@ public class Unlock
     )]
     private static readonly bool partners = false;
 
+    [ConfigEntry(
+        en: "Enable all events.",
+        zh: "启用所有的 “Events”"
+    )]
+    private static readonly bool events = true;
+
+    [EnableIf(nameof(events))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(EventManager), "IsOpenEvent")]
+    private static bool EnableAllEvent(ref bool __result, int eventId)
+    {
+        if (eventId > 0)
+            __result = true;
+        return false;
+    }
+
     private static List<
     (
         MethodInfo collectionProcessMethod,
