@@ -102,8 +102,8 @@ public class SanitizeUserData
         SanitizeItemIdField(userExtend, "selectDifficultyId", "GetMusicDifficultys", true);
         // categoryIndex?
         // musicIndex?
-        SanitizeEnumFieldIfDefined(userExtend, "selectScoreType", ResolveEnumType("ConstParameter.ScoreKind"));
-        SanitizeEnumFieldIfDefined(userExtend, "selectResultScoreViewType", ResolveEnumType("Process.ResultProcess.ResultScoreViewType"));
+        SanitizeEnumFieldIfDefined(userExtend, "selectScoreType", ResolveEnumType("MAI2System.ConstParameter+ScoreKind"));
+        SanitizeEnumFieldIfDefined(userExtend, "selectResultScoreViewType", ResolveEnumType("Process.ResultProcess+ResultScoreViewType"));
         SanitizeEnumFieldIfDefined(userExtend, "sortCategorySetting", ResolveEnumType("DB.SortTabID"));
         SanitizeEnumFieldIfDefined(userExtend, "sortMusicSetting", ResolveEnumType("DB.SortMusicID"));
         SanitizeEnumFieldIfDefined(userExtend, "playStatusSetting", ResolveEnumType("DB.PlaystatusTabID"));
@@ -340,11 +340,35 @@ public class SanitizeUserData
         return array;
     }
 
+    private static System.Type[] allTheTypes = null;
+
     private static System.Type ResolveEnumType(string enumName)
     {
-        return AppDomain.CurrentDomain
+#if DEBUG
+        MelonLogger.Msg($"[SanitizeUserData] Resolving enum {enumName}");
+#endif
+        allTheTypes ??= AppDomain.CurrentDomain
             .GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .FirstOrDefault(type => type.FullName == enumName && type.IsEnum);
+            .SelectMany(a =>
+            {
+                try
+                {
+                    return a.GetTypes();
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning($"[SanitizeUserData] Unable to parse assembly {a.FullName}: {ex.Message}");
+                    return [];
+                }
+            }).ToArray();
+        var result = allTheTypes.FirstOrDefault(type => type.FullName == enumName && type.IsEnum);
+#if DEBUG
+        MelonLogger.Msg($"[SanitizeUserData] Resolved: {result}");
+#endif
+        if (result == null)
+        {
+            MelonLogger.Warning($"[SanitizeUserData] Unable to resolve enum {enumName}");
+        }
+        return result;
     }
 }
