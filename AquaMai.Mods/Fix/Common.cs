@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Reflection;
 using AquaMai.Mods.GameSystem;
+using Manager.Operation;
 
 namespace AquaMai.Mods.Fix;
 
@@ -177,5 +178,15 @@ public class Common
 
         // Remove all instructions before the target instruction.
         return instList.Skip(onceDispIndex);
+    }
+
+    [ConfigEntry] private static readonly bool disableDataUploader = true;
+
+    [EnableIf(nameof(disableDataUploader))]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DataUploader), nameof(DataUploader.Start))]
+    private static bool PreDataUploaderStart()
+    {
+        return false;
     }
 }
