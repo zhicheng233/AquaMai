@@ -23,8 +23,6 @@ public class AdxHidInput
 
     private static void HidInputThread()
     {
-        MelonLogger.Msg("[HidInput] =======    HID Input Start   =======");
-
         while (true)
         {
             if (adxController1P != null)
@@ -73,12 +71,49 @@ public class AdxHidInput
         }
     }
 
+    public enum AdxKeyMap
+    {
+        None = 0,
+        Select1P,
+        Select2P,
+        Service,
+        Test,
+    }
+
+    [ConfigEntry(zh: "按钮 1（向上的三角键）")]
+    private static readonly AdxKeyMap button1 = AdxKeyMap.Select1P;
+
+    [ConfigEntry(zh: "按钮 2（三角键中间的圆形按键）")]
+    private static readonly AdxKeyMap button2 = AdxKeyMap.Service;
+
+    [ConfigEntry(zh: "按钮 3（向下的三角键）")]
+    private static readonly AdxKeyMap button3 = AdxKeyMap.Select2P;
+
+    [ConfigEntry(zh: "按钮 4（最下方的圆形按键）")]
+    private static readonly AdxKeyMap button4 = AdxKeyMap.Test;
+
     private static bool GetPushedByButton(int playerNo, InputId inputId)
     {
-        if (inputId.Value == "test") return inputBuf1P[13] == 1 || inputBuf2P[13] == 1;
-        if (inputId.Value == "service") return inputBuf1P[11] == 1 || inputBuf2P[11] == 1;
-        if (inputId.Value == "select" && playerNo == 0) return inputBuf1P[10] == 1 || inputBuf2P[10] == 1;
-        if (inputId.Value == "select" && playerNo == 1) return inputBuf1P[12] == 1 || inputBuf2P[12] == 1;
+        var current = AdxKeyMap.None;
+        if (inputId.Value == "test") current = AdxKeyMap.Test;
+        if (inputId.Value == "service") current = AdxKeyMap.Service;
+        if (inputId.Value == "select" && playerNo == 0) current = AdxKeyMap.Select1P;
+        if (inputId.Value == "select" && playerNo == 1) current = AdxKeyMap.Select2P;
+
+        AdxKeyMap[] arr = [button1, button2, button3, button4];
+        if (current != AdxKeyMap.None)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (arr[i] != current) continue;
+                var keyIndex = 10 + i;
+                if (inputBuf1P[keyIndex] == 1 || inputBuf2P[keyIndex] == 1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         var buf = playerNo == 0 ? inputBuf1P : inputBuf2P;
         if (inputId.Value == "button_01") return buf[5] == 1;
@@ -101,7 +136,15 @@ public class AdxHidInput
             return [jvsSwitch.GetMethod("Execute")];
         }
 
-        public static bool Prefix(int ____playerNo, InputId ____inputId, ref bool ____isStateOnOld2, ref bool ____isStateOnOld, ref bool ____isStateOn, ref bool ____isTriggerOn, ref bool ____isTriggerOff, KeyCode ____subKey)
+        public static bool Prefix(
+            int ____playerNo,
+            InputId ____inputId,
+            ref bool ____isStateOnOld2,
+            ref bool ____isStateOnOld,
+            ref bool ____isStateOn,
+            ref bool ____isTriggerOn,
+            ref bool ____isTriggerOff,
+            KeyCode ____subKey)
         {
             var flag = GetPushedByButton(____playerNo, ____inputId);
             // 不影响键盘
