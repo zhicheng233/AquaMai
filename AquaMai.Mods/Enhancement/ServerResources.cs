@@ -156,6 +156,11 @@ public class ServerResources
             // yield break;
         }
 
+        // 没有文件夹就新建
+        if (!Directory.Exists(Path.GetDirectoryName(cacheFile)))
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(cacheFile));
+        }
         File.WriteAllBytes(cacheFile, bytes);
         LoadFile();
     }
