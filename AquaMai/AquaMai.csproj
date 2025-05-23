@@ -72,6 +72,9 @@
     <EmbeddedResource Include="$(OutputPath)AquaMai.ErrorReport.exe">
       <LogicalName>AquaMai.ErrorReport.exe</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="configSort.yaml">
+      <LogicalName>configSort.yaml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
