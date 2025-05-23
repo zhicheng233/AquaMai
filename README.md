@@ -1,18 +1,13 @@
 # AquaMai
 
-This mod is heavily WIP. More details will be added as the development progresses.
-
 ## Installation
 
 1. Build the project or find an existing build somewhere™
-2. Download [MelonLoader.x64.zip](https://github.com/LavaGang/MelonLoader/releases/download/v0.6.1/MelonLoader.x64.zip) **v0.6.1** (important!)
+2. Download [MelonLoader.x64.zip](https://github.com/LavaGang/MelonLoader/releases/download/v0.7.0/MelonLoader.x64.zip)
 3. Extract MelonLoader zip to where your Sinmai.exe is
 4. Make a Mods folder and put AquaMai.dll inside it
 5. Pet your cat
 6. Launch!
-
-> [!WARNING]
-> MelonLoader must be version 0.6.1 or lower. Higher versions will crash due to an incompatibility in `mono-2.0-bdwgc.dll`
 
 ## Features
 
