@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using AMDaemon;
 using AquaMai.Config.Attributes;
+using AquaMai.Config.Types;
 using HarmonyLib;
 using HidLibrary;
 using MelonLoader;
@@ -69,15 +70,6 @@ public class AdxHidInput
             Thread hidThread = new Thread(HidInputThread);
             hidThread.Start();
         }
-    }
-
-    public enum AdxKeyMap
-    {
-        None = 0,
-        Select1P,
-        Select2P,
-        Service,
-        Test,
     }
 
     [ConfigEntry(zh: "按钮 1（向上的三角键）")]
