@@ -94,11 +94,14 @@ public class AdxHidInput
 
     private static bool GetPushedByButton(int playerNo, InputId inputId)
     {
-        var current = AdxKeyMap.None;
-        if (inputId.Value == "test") current = AdxKeyMap.Test;
-        if (inputId.Value == "service") current = AdxKeyMap.Service;
-        if (inputId.Value == "select" && playerNo == 0) current = AdxKeyMap.Select1P;
-        if (inputId.Value == "select" && playerNo == 1) current = AdxKeyMap.Select2P;
+        var current = inputId.Value switch
+        {
+            "test" => AdxKeyMap.Test,
+            "service" => AdxKeyMap.Service,
+            "select" when playerNo == 0 => AdxKeyMap.Select1P,
+            "select" when playerNo == 1 => AdxKeyMap.Select2P,
+            _ => AdxKeyMap.None,
+        };
 
         AdxKeyMap[] arr = [button1, button2, button3, button4];
         if (current != AdxKeyMap.None)
@@ -116,15 +119,18 @@ public class AdxHidInput
         }
 
         var buf = playerNo == 0 ? inputBuf1P : inputBuf2P;
-        if (inputId.Value == "button_01") return buf[5] == 1;
-        if (inputId.Value == "button_02") return buf[4] == 1;
-        if (inputId.Value == "button_03") return buf[3] == 1;
-        if (inputId.Value == "button_04") return buf[2] == 1;
-        if (inputId.Value == "button_05") return buf[9] == 1;
-        if (inputId.Value == "button_06") return buf[8] == 1;
-        if (inputId.Value == "button_07") return buf[7] == 1;
-        if (inputId.Value == "button_08") return buf[6] == 1;
-        return false;
+        return inputId.Value switch
+        {
+            "button_01" => buf[5] == 1,
+            "button_02" => buf[4] == 1,
+            "button_03" => buf[3] == 1,
+            "button_04" => buf[2] == 1,
+            "button_05" => buf[9] == 1,
+            "button_06" => buf[8] == 1,
+            "button_07" => buf[7] == 1,
+            "button_08" => buf[6] == 1,
+            _ => false,
+        };
     }
 
     [HarmonyPatch]
