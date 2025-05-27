@@ -50,6 +50,11 @@ jobs:
           name: AquaMai
           path: Output\Upload
 
+      - name: Upload CI release
+        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+        shell: cmd
+        run: build-assets\Releaser\AquaMaiReleaser.exe "Output\Upload\AquaMai.dll" "${{ env.GIT_DESCRIBE }}"
+
       - name: Send to Telegram
         if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
         run: |
