@@ -27,11 +27,11 @@ public class FixCheckAuth
             // So this can be used to transfer ambiguous data
             // we use this to notify that we can upgrade the link to https
             // as if we originally pass a https link to game, games without CheckServerHash will reject the link because ssl pinning
-            if (Auth.GameServerHost == "_AquaMai_Upgrade_")
+            if (Auth.GameServerHost == "_AquaMai_Upgrade_" && allowHttpsUpgrade)
             {
                 ____operationData.ServerUri = Auth.GameServerUri.Replace("http://", "https://");
             }
-            else if (upgradePort.IsMatch(Auth.GameServerHost))
+            else if (upgradePort.IsMatch(Auth.GameServerHost) && allowHttpsUpgrade)
             {
                 var match = upgradePort.Match(Auth.GameServerHost);
                 var builder = new UriBuilder(Auth.GameServerUri)
