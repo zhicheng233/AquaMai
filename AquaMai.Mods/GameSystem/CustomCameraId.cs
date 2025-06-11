@@ -47,7 +47,15 @@ public class CustomCameraId
         en: "WeChat QRCode Camera.",
         zh: "二维码扫描摄像头")]
     public static int chimeCamera;
+    [ConfigEntry(
+        en: "Custom WeChat QRCode camera width.",
+        zh: "自定义二维码扫描摄像头宽度")]
+    public static int customChimeCameraWidth;
 
+    [ConfigEntry(
+        en: "Custom WeChat QRCode camera height.",
+        zh: "自定义二维码扫描摄像头高度")]
+    public static int customChimeCameraHeight;
     private static readonly Dictionary<string, string> cameraTypeMap = new()
     {
         ["LeftQrCamera"] = "QRLeft",
@@ -97,9 +105,21 @@ public class CustomCameraId
             }
             else
             {
-                var webCamTexture = new WebCamTexture(WebCamTexture.devices[deviceId].name);
-                webCamTextures[cameraType] = webCamTexture;
-                textureCache[deviceId] = webCamTexture;
+                if (cameraTypeName == CameraManager.CameraTypeEnum.Chime &&
+                    (customChimeCameraWidth != null || customChimeCameraHeight != null))
+                {
+                    var webCamTexture = new WebCamTexture(
+                        WebCamTexture.devices[deviceId].name,
+                        customChimeCameraWidth,
+                        customChimeCameraHeight
+                    );
+                }
+                else
+                {
+                    var webCamTexture = new WebCamTexture(WebCamTexture.devices[deviceId].name);
+                    webCamTextures[cameraType] = webCamTexture;
+                    textureCache[deviceId] = webCamTexture;
+                }
             }
         }
 
