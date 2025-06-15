@@ -29,6 +29,20 @@ public class TouchToButtonInput
     }
 
     [HarmonyPostfix]
+    [HarmonyPatch(typeof(TestModeProcess), "OnStart")]
+    public static void OnTestModeProcessStart()
+    {
+        _isPlaying = true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TestModeProcess), "OnRelease")]
+    public static void OnTestModeProcessRelease()
+    {
+        _isPlaying = false;
+    }
+
+    [HarmonyPostfix]
     [HarmonyPatch(typeof(Manager.InputManager), "GetButtonDown")]
     public static void GetButtonDown(ref bool __result, int monitorId, ButtonSetting button)
     {
