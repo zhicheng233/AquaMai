@@ -1,7 +1,9 @@
 using System;
 using AquaMai.Config.Attributes;
+using AquaMai.Mods.GameSettings;
 using AquaMai.Mods.GameSystem.ExclusiveTouch;
 using LibUsbDotNet.Main;
+using MelonLoader;
 
 namespace AquaMai.Mods.GameSystem;
 
@@ -19,7 +21,7 @@ public class PdxTouch
 
     private static readonly PdxTouchDevice[] devices = new PdxTouchDevice[2];
 
-    public static void OnBeforePatch()
+    public static void OnBeforeEnableCheck()
     {
         if (string.IsNullOrWhiteSpace(path1p) && string.IsNullOrWhiteSpace(path2p))
         {
@@ -39,6 +41,20 @@ public class PdxTouch
             {
                 devices[1] = new PdxTouchDevice(1, path2p);
                 devices[1].Start();
+            }
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (devices[i] != null && devices[i].IsConnected)
+            {
+                if (!JudgeAdjust.shouldEnableImplicitly)
+                {
+                    JudgeAdjust.shouldEnableImplicitly = true;
+                }
+                if (i == 0) JudgeAdjust.b_1P += 1.0;
+                else JudgeAdjust.b_2P += 1.0;
+                MelonLogger.Msg($"[PdxTouch] {i + 1}P connected");
             }
         }
     }

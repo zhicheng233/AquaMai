@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using AquaMai.Config.Attributes;
+using AquaMai.Core.Attributes;
 using HarmonyLib;
 using IO;
 using MAI2.Util;
@@ -12,8 +13,11 @@ namespace AquaMai.Mods.GameSettings;
     name: "判定调整",
     en: "Globally adjust A/B judgment per player (unit same as in-game options) or increase touch delay.",
     zh: "全局分玩家调整 A/B 判（单位和游戏里一样）或增加触摸延迟")]
+[EnableImplicitlyIf(nameof(shouldEnableImplicitly))]
 public class JudgeAdjust
 {
+    public static bool shouldEnableImplicitly = false;
+
     [ConfigEntry(
         name: "1P A判",
         en: "Adjust A judgment for 1P.")]
@@ -27,12 +31,12 @@ public class JudgeAdjust
     [ConfigEntry(
         name: "1P B判",
         en: "Adjust B judgment for 1P.")]
-    public static readonly double b_1P = 0;
+    public static double b_1P = 0;
 
     [ConfigEntry(
         name: "2P B判",
         en: "Adjust B judgment for 2P.")]
-    public static readonly double b_2P = 0;
+    public static double b_2P = 0;
 
     [ConfigEntry(
         name: "触摸延迟",

@@ -1,4 +1,5 @@
-using System;
+
+using System.Diagnostics;
 using LibUsbDotNet.Main;
 using LibUsbDotNet;
 using MelonLoader;
@@ -14,10 +15,12 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
     private UsbDevice device;
     private TouchSensorMapper touchSensorMapper;
 
+    public bool IsConnected => device != null;
+
     private class TouchPoint
     {
         public ulong Mask;
-        public DateTime LastUpdate;
+        public long LastUpdateTick;
         public bool IsActive;
     }
 
@@ -25,10 +28,10 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
     private readonly TouchPoint[] allFingerPoints = new TouchPoint[256];
 
     // 防吃键
-    private ulong frameAccumulators;
+    private readonly InputLatch _touchLatch = new();
     private readonly object touchLock = new();
 
-    private const int TouchTimeoutMs = 20;
+    private static readonly long TouchTimeoutTicks = Stopwatch.Frequency / 50; // 20ms
 
     public void Start()
     {
@@ -125,63 +128,50 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
     {
         // 安全检查，防止越界
         if (fingerId < 0 || fingerId >= 256) return;
-
         lock (touchLock)
         {
             var point = allFingerPoints[fingerId];
-
             if (isPressed)
             {
                 ulong touchMask = touchSensorMapper.ParseTouchPoint(x, y);
-
-                if (!point.IsActive)
-                {
-                    point.IsActive = true;
-                }
-
+                point.IsActive = true;
                 point.Mask = touchMask;
-                point.LastUpdate = DateTime.Now;
-
-                frameAccumulators |= touchMask;
+                point.LastUpdateTick = Stopwatch.GetTimestamp();
             }
             else
             {
-                if (point.IsActive)
-                {
-                    point.IsActive = false;
-                }
+                point.IsActive = false;
             }
+            _touchLatch.Update(ComputeActiveMask());
         }
     }
 
+    private ulong ComputeActiveMask()
+    {
+        ulong mask = 0;
+        for (int i = 0; i < allFingerPoints.Length; i++)
+        {
+            if (allFingerPoints[i].IsActive)
+                mask |= allFingerPoints[i].Mask;
+        }
+        return mask;
+    }
     private ulong GetTouchState(int player)
     {
         if (player != playerNo) return 0;
         lock (touchLock)
         {
-            ulong currentTouchData = 0;
-            var now = DateTime.Now;
-
+            var now = Stopwatch.GetTimestamp();
             for (int i = 0; i < allFingerPoints.Length; i++)
             {
                 var point = allFingerPoints[i];
-                if (point.IsActive)
+                if (point.IsActive && (now - point.LastUpdateTick) > TouchTimeoutTicks)
                 {
-                    if ((now - point.LastUpdate).TotalMilliseconds > TouchTimeoutMs)
-                    {
-                        point.IsActive = false;
-                    }
-                    else
-                    {
-                        currentTouchData |= point.Mask;
-                    }
+                    point.IsActive = false;
                 }
             }
-
-            ulong finalResult = currentTouchData | frameAccumulators;
-            frameAccumulators = 0;
-
-            return finalResult;
+            _touchLatch.Update(ComputeActiveMask());
+            return _touchLatch.Read();
         }
     }
 }
