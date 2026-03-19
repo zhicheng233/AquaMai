@@ -10,7 +10,8 @@ using JetBrains.Annotations;
 
 namespace AquaMai.Mods.GameSystem.ExclusiveTouch;
 
-public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeNull] string serialNumber, [CanBeNull] string locationPath, byte configuration, int interfaceNumber, ReadEndpointID endpoint, int packetSize, int minX, int minY, int maxX, int maxY, bool flip, int radius)
+public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeNull] string serialNumber, [CanBeNull] string locationPath, byte configuration, int interfaceNumber, ReadEndpointID endpoint, int packetSize, int minX, int minY, int maxX, int maxY, bool flip, int radius,
+    float aExtraRadius = 0, float bExtraRadius = 0, float cExtraRadius = 0, float dExtraRadius = 0, float eExtraRadius = 0)
 {
     private UsbDevice device;
     private TouchSensorMapper touchSensorMapper;
@@ -67,7 +68,8 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
                 wholeDevice.SetConfiguration(configuration);
                 wholeDevice.ClaimInterface(interfaceNumber);
             }
-            touchSensorMapper = new TouchSensorMapper(minX, minY, maxX, maxY, radius, flip);
+            touchSensorMapper = new TouchSensorMapper(minX, minY, maxX, maxY, radius, flip,
+                aExtraRadius, bExtraRadius, cExtraRadius, dExtraRadius, eExtraRadius);
             Application.quitting += () =>
             {
                 var tmpDevice = device;
