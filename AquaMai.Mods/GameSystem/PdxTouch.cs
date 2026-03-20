@@ -11,7 +11,7 @@ namespace AquaMai.Mods.GameSystem;
 public class PdxTouch
 {
     [ConfigEntry("触摸体积半径", zh: "基准是 1440x1440")]
-    public static readonly int radius = 30;
+    public static readonly int radius = 20;
 
     [ConfigEntry("A 区额外半径",
         en: "Extra radius for A area (outer ring buttons). Can be negative to shrink.",
@@ -21,7 +21,7 @@ public class PdxTouch
     [ConfigEntry("B 区额外半径",
         en: "Extra radius for B area (middle ring sensors). Can be negative to shrink.",
         zh: "B 区（中圈传感器）的额外半径，可以为负值来缩小")]
-    public static readonly float bAreaExtraRadius = 0;
+    public static readonly float bAreaExtraRadius = 25;
 
     [ConfigEntry("C 区额外半径",
         en: "Extra radius for C area (center sensors). Can be negative to shrink.",
@@ -36,7 +36,7 @@ public class PdxTouch
     [ConfigEntry("E 区额外半径",
         en: "Extra radius for E area (innermost ring sensors). Can be negative to shrink.",
         zh: "E 区（最内圈传感器）的额外半径，可以为负值来缩小")]
-    public static readonly float eAreaExtraRadius = 0;
+    public static readonly float eAreaExtraRadius = 30;
 
     [ConfigEntry("1P 设备路径", zh: "USB 端口路径，例如 2.2。请使用配置工具中显示的路径。留空则使用第一个检测到的设备作为 1P")]
     public static readonly string path1p = "";
