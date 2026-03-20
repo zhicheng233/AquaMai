@@ -1,6 +1,7 @@
 常用:
   - General
   - GameSystem.SinglePlayer
+  - GameSystem.EnableFreedomMode
   - GameSystem.DisableTimeout
   - GameSystem.QuickRetry
   - UX.OneKeyEntryEnd
