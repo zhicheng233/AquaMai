@@ -204,7 +204,7 @@ public class MaimollerDeviceNative : IMaimollerDevice
             _reportBuffer[31] = (byte)_output.indicators;
 
             // Skip write if unchanged since last send
-            if (!_forceNextWrite && _reportBuffer.SequenceEqual(_lastSentReport) && Stopwatch.GetTimestamp() - _lastWriteTick < Stopwatch.Frequency * 2)
+            if (!_forceNextWrite && _reportBuffer.SequenceEqual(_lastSentReport) && Stopwatch.GetTimestamp() - _lastWriteTick < Stopwatch.Frequency / 2)
                 return;
 
             HidRawIO.Write(device, _reportBuffer);
