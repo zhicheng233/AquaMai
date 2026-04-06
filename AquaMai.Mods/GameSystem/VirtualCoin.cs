@@ -74,7 +74,7 @@ public static class VirtualCoin
         """
         HTTP服务监听的端口
         """)]
-    private static readonly int Prot = 7654;
+    private static readonly int Port = 7654;
 
     [ConfigEntry(
         "密码验证",
@@ -114,8 +114,8 @@ public static class VirtualCoin
         if (IsUseRemote)
         {
             CreditHttpServerHost.StartOnce();
-            MelonModLogger.Msg("[VirtualCoin] HTTP Server started: " +
-                               (CreditHttpServerHost.IsRunning ? $"Success on {Prot}" : "Failed"));
+            MelonLogger.Msg("[VirtualCoin] HTTP Server started: " +
+                               (CreditHttpServerHost.IsRunning ? $"Success on {Port}" : "Failed"));
         }
     }
 
@@ -245,7 +245,7 @@ public static class VirtualCoin
                 }
 
                 Func<bool> lambda = () =>
-                    (bool)creditUnit_payGameCost_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
+                    (bool)creditUnit_isGameCostEnough_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
                 __result = (bool)call_Method.Invoke(null, new object[] { lambda });
                 return false;
             }
@@ -396,9 +396,9 @@ public static class VirtualCoin
 
         private static int GetPort()
         {
-            if (Prot > 0 && Prot <= 65535)
+            if (Port > 0 && Port <= 65535)
             {
-                return Prot;
+                return Port;
             }
 
             return 6543;
