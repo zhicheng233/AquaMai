@@ -274,6 +274,7 @@ public static class VirtualCoin
                 MelonLogger.Msg($"#1:_buffer:{_bufferCredit}");
 # endif
 
+                __result = true;
                 return false;
             }
 
