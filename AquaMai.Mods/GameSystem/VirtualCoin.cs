@@ -97,16 +97,13 @@ public static class VirtualCoin
 
     private static bool IsUseKeyboard => CoinKey != KeyCodeOrName.None;
 
-    private static int _bufferCredit = 0;
+    // 出于线程安全，下面变量应该仅在Unity主线程写入（通过MelonCoroutine.Start等方式）。其他线程只能读，不应写入。
+    private static volatile int _bufferCredit = 0;
 
     //缓存以提升性能
-    private static IntPtr Pointer;
+    private static PropertyInfo pointerProp;
 
-    private static MethodInfo call_Method;
-
-    private static MethodInfo creditUnit_isGameCostEnough_Method;
-
-    private static MethodInfo creditUnit_payGameCost_Method;
+    private static Dictionary<string, MethodInfo> methods = new();
 
     public static void OnAfterPatch()
     {
@@ -145,13 +142,8 @@ public static class VirtualCoin
 
     private static IntPtr GetPointer(CreditUnit __instance)
     {
-        var pointerProp = AccessTools.Property(typeof(CreditUnit), "Pointer");
-        if (pointerProp == null)
-        {
-            throw new Exception("Failed to access Pointer property");
-        }
-
-        var pointerValue = pointerProp.GetValue(__instance);
+        if (pointerProp == null) pointerProp = AccessTools.Property(typeof(CreditUnit), "Pointer");
+        var pointerValue = pointerProp?.GetValue(__instance);
         if (pointerValue == null)
         {
             throw new Exception("Failed to get Pointer value");
@@ -207,8 +199,14 @@ public static class VirtualCoin
         return calledMethod;
     }
 
-
-
+    private static bool CallAPIMethod(string methodName, object[] arguments)
+    {
+        if (!methods.ContainsKey("Call")) methods["Call"] = GetAPIMethod("Call");
+        if (!methods.ContainsKey(methodName)) methods[methodName] = GetAPIMethod(methodName);
+        
+        Func<bool> lambda = () => (bool)methods[methodName].Invoke(null, arguments);
+        return (bool)methods["Call"].Invoke(null, [lambda]);
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CreditUnit), "IsGameCostEnough", new Type[] { typeof(int), typeof(int) })]
@@ -224,20 +222,8 @@ public static class VirtualCoin
             }
             else if (_bufferCredit != 0 && _bufferCredit < needCost)
             {
-                needCost -= (int)_bufferCredit;
-                if (call_Method == null)
-                {
-                    call_Method = GetAPIMethod("Call");
-                }
-
-                if (creditUnit_isGameCostEnough_Method == null)
-                {
-                    creditUnit_isGameCostEnough_Method = GetAPIMethod("CreditUnit_isGameCostEnough");
-                }
-
-                Func<bool> lambda = () =>
-                    (bool)creditUnit_isGameCostEnough_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
-                __result = (bool)call_Method.Invoke(null, new object[] { lambda });
+                needCost -= _bufferCredit;
+                __result = CallAPIMethod("CreditUnit_isGameCostEnough", [GetPointer(__instance), 0, needCost]);
                 return false;
             }
 
@@ -256,7 +242,7 @@ public static class VirtualCoin
     {
         try
         {
-            var needCost = (uint)GetNeedCost(__instance, gameCostIndex, count);
+            var needCost = GetNeedCost(__instance, gameCostIndex, count);
             if (_bufferCredit - needCost >= 0)
             {
                 _bufferCredit -= (int)needCost;
@@ -271,25 +257,13 @@ public static class VirtualCoin
 
             if (_bufferCredit > 0 && _bufferCredit - needCost < 0)
             {
-                needCost -= (uint)_bufferCredit;
+                needCost -= _bufferCredit;
                 _bufferCredit = 0;
 
 # if DEBUG
                 MelonLogger.Msg($"#2:_buffer:{_bufferCredit};needCost:{needCost}");
 # endif
-
-                if (call_Method == null)
-                {
-                    call_Method = GetAPIMethod("Call");
-                }
-                if (creditUnit_payGameCost_Method == null)
-                {
-                    creditUnit_payGameCost_Method = GetAPIMethod("CreditUnit_payGameCost");
-                }
-
-                Func<bool> lambda = () =>
-                    (bool)creditUnit_payGameCost_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
-                __result = (bool)call_Method.Invoke(null, new object[] { lambda });
+                __result = CallAPIMethod("CreditUnit_payGameCost", [GetPointer(__instance), 0, (int)needCost]);
                 return false;
             }
 
@@ -434,6 +408,8 @@ public static class VirtualCoin
                 uint bufferCredit = 0;
                 var freePlay = false;
 
+                // 对下列的信息，可以不做多线程保护，因为是只读的、而且变量之间相互没有依赖，
+                // 而且这只是一个信息性质的GET接口、对实时性没有要求，所以直接只读访问变量问题不大。
                 var player = Credit.Players[0];
                 bufferCredit = (uint)_bufferCredit;
                 credit = player.Credit;
@@ -454,17 +430,22 @@ public static class VirtualCoin
                     return;
                 }
 
-                _bufferCredit += 1;
-                if (IsPlaySound)
-                {
-                    SoundManager.PlaySystemSE(Cue.SE_SYS_CREDIT);
-                }
-
-                WriteJson(context.Response, 200, "{\"ok\":true,\"bufferCredit\":" + _bufferCredit + "}");
+                MelonCoroutines.Start(AddCredit());
+                WriteJson(context.Response, 200, "{\"ok\":true}");
                 return;
             }
 
             WriteJson(context.Response, 404, "{\"ok\":false,\"error\":\"not_found\"}");
+        }
+        
+        private static IEnumerator AddCredit()
+        {
+            _bufferCredit += 1;
+            if (IsPlaySound)
+            {
+                SoundManager.PlaySystemSE(Cue.SE_SYS_CREDIT);
+            }
+            yield return true;
         }
 
         private static void WriteJson(HttpListenerResponse response, int statusCode, string payload)
