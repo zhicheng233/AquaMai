@@ -1,22 +1,23 @@
-﻿using System;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using AMDaemon;
 using AquaMai.Config.Attributes;
 using AquaMai.Config.Types;
 using AquaMai.Core.Attributes;
+using AquaMai.Core.Helpers;
 using HarmonyLib;
 using Mai2.Mai2Cue;
 using Main;
 using Manager;
 using MelonLoader;
-using Process;
-using UnityEngine;
 using Credit = AMDaemon.Credit;
-using Input = UnityEngine.Input;
 using Type = System.Type;
 
 
@@ -25,44 +26,43 @@ namespace AquaMai.Mods.GameSystem;
 [ConfigSection(
     "虚拟投币",
     zh: """
-        在不依赖 SegaTools 的前提下实现的投币功能
-        支持通过键盘按键或 HTTP 接口远程增加点数
+        基于Mod，在不依赖 SegaTools 的前提下实现的投币功能
+        支持通过键盘按键、机台上自定义功能键或 HTTP 接口远程增加点数
         注意:该功能增加的点数游戏重启后不会保存
         """,
     en: """
         Implements a custom Credit system without relying on SegaTools
-        Supports adding Credits via keyboard input or remotely through an HTTP service
+        Supports adding Credits via keyboard input, cabinet custom FN key or remotely through an HTTP service
         Note: Credits added by this feature are not persisted and will be reset after restarting the game
         """)]
 public static class VirtualCoin
 {
     [ConfigEntry(
-        "启用键盘按键",
+        "投币按键",
         """
-        Adding Credits via keyboard input.
+        Bind a key for add a credit (Keyboard key or cabinet custom FN key)
         """,
         """
-        使用键盘按键增加点数
+        绑定使用的投币按键（键盘按键或自定义功能键均可）
         """)]
-    private static readonly bool IsUseKeyboard = true;
-
+    public static readonly KeyCodeOrName CoinKey = KeyCodeOrName.Equals;
+    
     [ConfigEntry(
-        "绑定按键",
-        """
-        Bind keyboard.
-        """,
-        """
-        绑定使用的键盘按键
-        """)]
-    public static readonly KeyCodeID CoinKey = (KeyCodeID)35;
+        "长按",
+        "Should long press to trigger",
+        "是否长按上述按键才能触发"
+        )]
+    public static readonly bool LongPress = false;
 
     [ConfigEntry(
         "启用远程投币",
         """
         Remotely add Credits via an HTTP interface.
+        Warning: If you enable this option, an HTTP server will listen on 0.0.0.0 on your machine (the port is specified by the option below). Please be mindful of security risks and consider using password authentication.
         """,
         """
-        通过 HTTP 接口远程增加点数
+        通过 HTTP 接口远程增加点数。
+        警告：若开启此项，则会在您机器的0.0.0.0上监听一个HTTP服务器（端口号由下面选项指定）。请注意安全性问题，并考虑配合密码验证。
         """)]
     private static readonly bool IsUseRemote = false;
 
@@ -79,10 +79,10 @@ public static class VirtualCoin
     [ConfigEntry(
         "密码验证",
         """
-        Enable password verification for the HTTP service. leave it blank to skip.When requesting, the url contains '?password='
+        Enable password verification for the HTTP service, or leave it blank to disable password verification. If enabled, the requests should be with query param '?password='
         """,
         """
-        设置访问密码,留空不使用,请求的时候url带'?password='
+        设置访问密码，留空则不使用密码。如果使用密码，请求时URL后应当追加参数'?password='
         """)]
     private static readonly string Password = "";
 
@@ -96,31 +96,25 @@ public static class VirtualCoin
         """)]
     private static readonly bool IsPlaySound = true;
 
-    private static int _bufferCredit = 0;
+    private static bool IsUseKeyboard => CoinKey != KeyCodeOrName.None;
 
-    private static bool _isFieldSuccess = false;
+    // 出于线程安全，下面变量应该仅在Unity主线程写入（通过MelonCoroutine.Start等方式）。其他线程只能读，不应写入。
+    private static volatile int _bufferCredit = 0;
 
     //缓存以提升性能
-    private static IntPtr Pointer;
+    private static PropertyInfo pointerProp;
 
-    private static MethodInfo call_Method;
-
-    private static MethodInfo creditUnit_isGameCostEnough_Method;
-
-    private static MethodInfo creditUnit_payGameCost_Method;
+    private static Dictionary<string, MethodInfo> methods = new();
 
     public static void OnAfterPatch()
     {
         if (IsUseRemote)
         {
             CreditHttpServerHost.StartOnce();
-            MelonLogger.Msg("[VirtualCoin] HTTP Server started: " +
-                               (CreditHttpServerHost.IsRunning ? $"Success on {Port}" : "Failed"));
         }
     }
 
     //该功能实现实际上很简单，就是整一个缓存点数，扣Credit的时候优先扣缓存中的Credit，然后不够再交给原逻辑
-
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CreditUnit), "Credit", MethodType.Getter)]
     public static void CreditPatch(ref uint __result)
@@ -130,12 +124,12 @@ public static class VirtualCoin
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CreditUnit), "IsZero", MethodType.Getter)]
-    public static void IsZorePatch(ref bool __result)
+    public static void IsZeroPatch(ref bool __result)
     {
         __result = __result && _bufferCredit == 0;
     }
 
-    public static int GetNeedCost(CreditUnit __instance, int gameCostIndex, int count)
+    private static int GetNeedCost(CreditUnit __instance, int gameCostIndex, int count)
     {
         var gameCosts = __instance.GameCosts;
         if (gameCosts == null)
@@ -144,23 +138,13 @@ public static class VirtualCoin
         }
 
         var needCost = count * (int)gameCosts[gameCostIndex];
-
-# if DEBUG
-        MelonLogger.Msg($"NeedCost:{needCost} Credits.");
-# endif
-
         return needCost;
     }
 
-    public static IntPtr GetPointer(CreditUnit __instance)
+    private static IntPtr GetPointer(CreditUnit __instance)
     {
-        var pointerProp = AccessTools.Property(typeof(CreditUnit), "Pointer");
-        if (pointerProp == null)
-        {
-            throw new Exception("Failed to access Pointer property");
-        }
-
-        var pointerValue = pointerProp.GetValue(__instance);
+        if (pointerProp == null) pointerProp = AccessTools.Property(typeof(CreditUnit), "Pointer");
+        var pointerValue = pointerProp?.GetValue(__instance);
         if (pointerValue == null)
         {
             throw new Exception("Failed to get Pointer value");
@@ -169,7 +153,7 @@ public static class VirtualCoin
         return (IntPtr)pointerValue;
     }
 
-    public static MethodInfo GetAPIMethod(string apiName, params Type[] parameterTypes)
+    private static MethodInfo GetAPIMethod(string apiName, params Type[] parameterTypes)
     {
         var apiType = AccessTools.TypeByName("AMDaemon.Api");
         if (apiType == null)
@@ -216,8 +200,14 @@ public static class VirtualCoin
         return calledMethod;
     }
 
-
-
+    private static bool CallAPIMethod(string methodName, object[] arguments)
+    {
+        if (!methods.ContainsKey("Call")) methods["Call"] = GetAPIMethod("Call");
+        if (!methods.ContainsKey(methodName)) methods[methodName] = GetAPIMethod(methodName);
+        
+        Func<bool> lambda = () => (bool)methods[methodName].Invoke(null, arguments);
+        return (bool)methods["Call"].Invoke(null, [lambda]);
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CreditUnit), "IsGameCostEnough", new Type[] { typeof(int), typeof(int) })]
@@ -233,20 +223,8 @@ public static class VirtualCoin
             }
             else if (_bufferCredit != 0 && _bufferCredit < needCost)
             {
-                needCost -= (int)_bufferCredit;
-                if (call_Method == null)
-                {
-                    call_Method = GetAPIMethod("Call");
-                }
-
-                if (creditUnit_isGameCostEnough_Method == null)
-                {
-                    creditUnit_isGameCostEnough_Method = GetAPIMethod("CreditUnit_isGameCostEnough");
-                }
-
-                Func<bool> lambda = () =>
-                    (bool)creditUnit_isGameCostEnough_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
-                __result = (bool)call_Method.Invoke(null, new object[] { lambda });
+                needCost -= _bufferCredit;
+                __result = CallAPIMethod("CreditUnit_isGameCostEnough", [GetPointer(__instance), 0, needCost]);
                 return false;
             }
 
@@ -265,7 +243,7 @@ public static class VirtualCoin
     {
         try
         {
-            var needCost = (uint)GetNeedCost(__instance, gameCostIndex, count);
+            var needCost = GetNeedCost(__instance, gameCostIndex, count);
             if (_bufferCredit - needCost >= 0)
             {
                 _bufferCredit -= (int)needCost;
@@ -280,25 +258,13 @@ public static class VirtualCoin
 
             if (_bufferCredit > 0 && _bufferCredit - needCost < 0)
             {
-                needCost -= (uint)_bufferCredit;
+                needCost -= _bufferCredit;
                 _bufferCredit = 0;
 
 # if DEBUG
                 MelonLogger.Msg($"#2:_buffer:{_bufferCredit};needCost:{needCost}");
 # endif
-
-                if (call_Method == null)
-                {
-                    call_Method = GetAPIMethod("Call");
-                }
-                if (creditUnit_payGameCost_Method == null)
-                {
-                    creditUnit_payGameCost_Method = GetAPIMethod("CreditUnit_payGameCost");
-                }
-
-                Func<bool> lambda = () =>
-                    (bool)creditUnit_payGameCost_Method.Invoke(null, new object[] { GetPointer(__instance), 0, (int)needCost });
-                __result = (bool)call_Method.Invoke(null, new object[] { lambda });
+                __result = CallAPIMethod("CreditUnit_payGameCost", [GetPointer(__instance), 0, (int)needCost]);
                 return false;
             }
 
@@ -316,25 +282,13 @@ public static class VirtualCoin
     [HarmonyPostfix]
     public static void OnUpdatePatch()
     {
-        if (Input.GetKeyDown(getKeyCode(CoinKey)))
+        if (KeyListener.GetKeyDownOrLongPress(CoinKey, LongPress))
         {
             _bufferCredit += 1;
             if (IsPlaySound)
             {
                 SoundManager.PlaySystemSE(Cue.SE_SYS_CREDIT);
             }
-        }
-    }
-
-    private static KeyCode getKeyCode(KeyCodeID keyCodeID)
-    {
-        try
-        {
-            return (KeyCode)Enum.Parse(typeof(KeyCode), keyCodeID.ToString());
-        }
-        catch (Exception)
-        {
-            return KeyCode.Equals;
         }
     }
 
@@ -347,8 +301,6 @@ public static class VirtualCoin
         private static Thread _listenThread;
 
         private static volatile bool _running;
-
-        public static bool IsRunning => _running;
 
         public static void StartOnce()
         {
@@ -368,20 +320,22 @@ public static class VirtualCoin
                 {
                     var port = GetPort();
                     _listener = new HttpListener();
-                    _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+                    _listener.Prefixes.Add($"http://*:{port}/");
                     _listener.Start();
 
                     _running = true;
                     _listenThread = new Thread(ListenLoop)
                     {
                         IsBackground = true,
-                        Name = "AMDaemon.CreditHttpServer"
+                        Name = "AquaMai.VirtualCoin.CreditHttpServer"
                     };
                     _listenThread.Start();
+                    MelonLogger.Msg($"[VirtualCoin] HTTP Server started: Success on {port}");
                 }
-                catch
+                catch (Exception e)
                 {
                     _running = false;
+                    MelonLogger.Error($"[VirtualCoin] HTTP Server started Failed: {e}");
                     try
                     {
                         _listener?.Close();
@@ -402,7 +356,7 @@ public static class VirtualCoin
                 return Port;
             }
 
-            return 6543;
+            return 7654;
         }
 
         private static void ListenLoop()
@@ -455,6 +409,8 @@ public static class VirtualCoin
                 uint bufferCredit = 0;
                 var freePlay = false;
 
+                // 对下列的信息，可以不做多线程保护，因为是只读的、而且变量之间相互没有依赖，
+                // 而且这只是一个信息性质的GET接口、对实时性没有要求，所以直接只读访问变量问题不大。
                 var player = Credit.Players[0];
                 bufferCredit = (uint)_bufferCredit;
                 credit = player.Credit;
@@ -475,17 +431,22 @@ public static class VirtualCoin
                     return;
                 }
 
-                _bufferCredit += 1;
-                if (IsPlaySound)
-                {
-                    SoundManager.PlaySystemSE(Cue.SE_SYS_CREDIT);
-                }
-
-                WriteJson(context.Response, 200, "{\"ok\":true,\"bufferCredit\":" + _bufferCredit + "}");
+                MelonCoroutines.Start(AddCredit());
+                WriteJson(context.Response, 200, "{\"ok\":true}");
                 return;
             }
 
             WriteJson(context.Response, 404, "{\"ok\":false,\"error\":\"not_found\"}");
+        }
+        
+        private static IEnumerator AddCredit()
+        {
+            _bufferCredit += 1;
+            if (IsPlaySound)
+            {
+                SoundManager.PlaySystemSE(Cue.SE_SYS_CREDIT);
+            }
+            yield return true;
         }
 
         private static void WriteJson(HttpListenerResponse response, int statusCode, string payload)
@@ -506,7 +467,23 @@ public static class VirtualCoin
             }
 
             var input = request.QueryString["password"];
-            return string.Equals(input, Password, StringComparison.Ordinal);
+            return FixedTimeEquals(input, Password);
+        }
+        
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        private static bool FixedTimeEquals(string left, string right)
+        {
+            if (left == null || right == null) return false;
+            if (left.Length != right.Length) return false;
+
+            int result = 0;
+            for (int i = 0; i < left.Length; i++)
+            {
+                // 使用按位或，只要有一处不等，result 就会变成非零值
+                result |= left[i] ^ right[i];
+            }
+
+            return result == 0;
         }
     }
 }
