@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using AMDaemon;
@@ -466,7 +467,23 @@ public static class VirtualCoin
             }
 
             var input = request.QueryString["password"];
-            return string.Equals(input, Password, StringComparison.Ordinal);
+            return FixedTimeEquals(input, Password);
+        }
+        
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+        private static bool FixedTimeEquals(string left, string right)
+        {
+            if (left == null || right == null) return false;
+            if (left.Length != right.Length) return false;
+
+            int result = 0;
+            for (int i = 0; i < left.Length; i++)
+            {
+                // 使用按位或，只要有一处不等，result 就会变成非零值
+                result |= left[i] ^ right[i];
+            }
+
+            return result == 0;
         }
     }
 }
