@@ -54,4 +54,7 @@ public enum KeyCodeOrName
     CustomFn2,
     CustomFn3,
     CustomFn4,
+    
+    Equals = 100, // 这里的100是为了预留未来的添加空间的。后面新增的枚举值一律在100后面依次排列
+    // 注：出于配置向前兼容性起见，新增的key请一律放在最下方，避免破坏上面已经有的键的枚举值
 }
