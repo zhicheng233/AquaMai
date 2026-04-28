@@ -375,3 +375,4 @@ tools
 AquaMai/BuildInfo.g.cs
 .idea
 .sisyphus
+*.lscache
