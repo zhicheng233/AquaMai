@@ -265,7 +265,7 @@ public class AdxHidInput
     [ConfigEntry(name: "1P 按钮 3", zh: "向下的三角键")]
     private static readonly IOKeyMap p1Button3 = IOKeyMap.Select2P;
 
-    [ConfigEntry(name: "1P 按钮 4（最下方的圆形按键）")]
+    [ConfigEntry(name: "1P 按钮 4", zh: "最下方的圆形按键")]
     private static readonly IOKeyMap p1Button4 = IOKeyMap.Test;
 
     [ConfigEntry("1P 禁用外键输入")]
