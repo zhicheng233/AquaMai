@@ -199,6 +199,7 @@ public class AdxHidInput
 
     public static void OnBeforeEnableCheck()
     {
+        InitKeyMaps();
         TryConnectDevice(0);
         TryConnectDevice(1);
 
@@ -210,10 +211,9 @@ public class AdxHidInput
             }
         }
 
-        if (disableButtons) return;
-
         for (int i = 0; i < 2; i++)
         {
+            if (i == 0 ? p1DisableButtons : p2DisableButtons) continue;
             if (hidThreadRunning[i]) continue;
             if (!RealHotPlugSupport && adxController[i] == null) continue;
             if (!RealHotPlugSupport && !NeedsButtonInput(i)) continue;
@@ -256,48 +256,78 @@ public class AdxHidInput
         return inputLatch[playerNo].ReadBit(bufIndex);
     }
 
-    [ConfigEntry(name: "按钮 1（向上的三角键）")]
-    private static readonly IOKeyMap button1 = IOKeyMap.Select1P;
+    [ConfigEntry(name: "1P 按钮 1", zh: "向上的三角键")]
+    private static readonly IOKeyMap p1Button1 = IOKeyMap.Select1P;
 
-    [ConfigEntry(name: "按钮 2（三角键中间的圆形按键）")]
-    private static readonly IOKeyMap button2 = IOKeyMap.Service;
+    [ConfigEntry(name: "1P 按钮 2", zh: "三角键中间的圆形按键")]
+    private static readonly IOKeyMap p1Button2 = IOKeyMap.Service;
 
-    [ConfigEntry(name: "按钮 3（向下的三角键）")]
-    private static readonly IOKeyMap button3 = IOKeyMap.Select2P;
+    [ConfigEntry(name: "1P 按钮 3", zh: "向下的三角键")]
+    private static readonly IOKeyMap p1Button3 = IOKeyMap.Select2P;
 
-    [ConfigEntry(name: "按钮 4（最下方的圆形按键）")]
-    private static readonly IOKeyMap button4 = IOKeyMap.Test;
+    [ConfigEntry(name: "1P 按钮 4（最下方的圆形按键）")]
+    private static readonly IOKeyMap p1Button4 = IOKeyMap.Test;
 
-    [ConfigEntry("禁用外键输入")]
-    private static readonly bool disableButtons = false;
+    [ConfigEntry("1P 禁用外键输入")]
+    private static readonly bool p1DisableButtons = false;
+
+    [ConfigEntry(name: "2P 按钮 1", zh: "向上的三角键")]
+    private static readonly IOKeyMap p2Button1 = IOKeyMap.Select1P;
+
+    [ConfigEntry(name: "2P 按钮 2", zh: "三角键中间的圆形按键")]
+    private static readonly IOKeyMap p2Button2 = IOKeyMap.Service;
+
+    [ConfigEntry(name: "2P 按钮 3", zh: "向下的三角键")]
+    private static readonly IOKeyMap p2Button3 = IOKeyMap.Select2P;
+
+    [ConfigEntry(name: "2P 按钮 4", zh: "最下方的圆形按键")]
+    private static readonly IOKeyMap p2Button4 = IOKeyMap.Test;
+
+    [ConfigEntry("2P 禁用外键输入")]
+    private static readonly bool p2DisableButtons = false;
+
+    private static readonly IOKeyMap[][] keyMaps = new IOKeyMap[2][];
+
+    private static void InitKeyMaps()
+    {
+        keyMaps[0] = [p1Button1, p1Button2, p1Button3, p1Button4];
+        keyMaps[1] = [p2Button1, p2Button2, p2Button3, p2Button4];
+    }
+
+    private static void ApplyAuxiliaryInput(AuxiliaryState state, IOKeyMap keyMap, bool isPushed, int playerNo)
+    {
+        switch (keyMap)
+        {
+            case IOKeyMap.Select1P:
+                state.select1P |= isPushed;
+                break;
+            case IOKeyMap.Select2P:
+                state.select2P |= isPushed;
+                break;
+            case IOKeyMap.Select:
+                if (playerNo == 0) state.select1P |= isPushed;
+                else state.select2P |= isPushed;
+                break;
+            case IOKeyMap.Service:
+                state.service |= isPushed;
+                break;
+            case IOKeyMap.Test:
+                state.test |= isPushed;
+                break;
+        }
+    }
 
     private static AuxiliaryState GetAuxiliaryState()
     {
         var auxiliaryState = new AuxiliaryState();
-        IOKeyMap[] keyMaps = [button1, button2, button3, button4];
-        for (int i = 0; i < 4; i++)
+        for (int p = 0; p < 2; p++)
         {
-            var keyIndex = 10 + i;
-            var is1PPushed = inputLatch[0].ReadBit(keyIndex);
-            var is2PPushed = inputLatch[1].ReadBit(keyIndex);
-            switch (keyMaps[i])
+            var maps = keyMaps[p];
+            for (int i = 0; i < 4; i++)
             {
-                case IOKeyMap.Select1P:
-                    auxiliaryState.select1P |= is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Select2P:
-                    auxiliaryState.select2P |= is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Select:
-                    auxiliaryState.select1P |= is1PPushed;
-                    auxiliaryState.select2P |= is2PPushed;
-                    break;
-                case IOKeyMap.Service:
-                    auxiliaryState.service = is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Test:
-                    auxiliaryState.test = is1PPushed || is2PPushed;
-                    break;
+                var keyIndex = 10 + i;
+                var isPushed = inputLatch[p].ReadBit(keyIndex);
+                ApplyAuxiliaryInput(auxiliaryState, maps[i], isPushed, p);
             }
         }
         return auxiliaryState;
@@ -306,27 +336,28 @@ public class AdxHidInput
     private static CustomFnState GetCustomFnState()
     {
         var result = new CustomFnState();
-        IOKeyMap[] keyMaps = [button1, button2, button3, button4];
-        for (int i = 0; i < 4; i++)
+        for (int p = 0; p < 2; p++)
         {
-            var keyIndex = 10 + i;
-            var is1PPushed = inputLatch[0].ReadBit(keyIndex);
-            var is2PPushed = inputLatch[1].ReadBit(keyIndex);
-            var isPushed = is1PPushed || is2PPushed;
-            switch (keyMaps[i])
+            var maps = keyMaps[p];
+            for (int i = 0; i < 4; i++)
             {
-                case IOKeyMap.CustomFn1:
-                    result.CustomFn1 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn2:
-                    result.CustomFn2 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn3:
-                    result.CustomFn3 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn4:
-                    result.CustomFn4 |= isPushed;
-                    break;
+                var keyIndex = 10 + i;
+                var isPushed = inputLatch[p].ReadBit(keyIndex);
+                switch (maps[i])
+                {
+                    case IOKeyMap.CustomFn1:
+                        result.CustomFn1 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn2:
+                        result.CustomFn2 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn3:
+                        result.CustomFn3 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn4:
+                        result.CustomFn4 |= isPushed;
+                        break;
+                }
             }
         }
         return result;
