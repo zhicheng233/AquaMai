@@ -45,7 +45,7 @@ public class Fonts
             If empty, uses the general paths above.
             """,
         zh: """
-            SEGA_MaruGothicDB SDF 的单独字体路径
+            SEGA_MaruGothicDB（文本用圆体）的单独字体路径
             使用分号分隔多个路径
             留空则使用上方的总设置
             """)]
@@ -58,7 +58,7 @@ public class Fonts
             If empty, uses the general paths above.
             """,
         zh: """
-            SEGA_NewRodinN v2-EB_0 SDF 的单独字体路径
+            SEGA_NewRodinN v2-EB_0（标题用粗体）的单独字体路径
             使用分号分隔多个路径
             留空则使用上方的总设置
             """)]
