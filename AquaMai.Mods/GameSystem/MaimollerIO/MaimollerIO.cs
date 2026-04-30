@@ -105,17 +105,31 @@ public class MaimollerIO
 
     private static bool IsAnyLedEnabled => led1p || led2p;
 
-    [ConfigEntry(name: "按钮 1（三角形）")]
-    private static readonly IOKeyMap button1 = IOKeyMap.Select1P;
+    [ConfigEntry(name: "1P 按钮 1（三角形）")]
+    private static readonly IOKeyMap p1Button1 = IOKeyMap.Select1P;
 
-    [ConfigEntry(name: "按钮 2（圆形）")]
-    private static readonly IOKeyMap button2 = IOKeyMap.Test;
+    [ConfigEntry(name: "1P 按钮 2（圆形）")]
+    private static readonly IOKeyMap p1Button2 = IOKeyMap.Test;
 
-    [ConfigEntry(name: "按钮 3（圆形）")]
-    private static readonly IOKeyMap button3 = IOKeyMap.Service;
+    [ConfigEntry(name: "1P 按钮 3（圆形）")]
+    private static readonly IOKeyMap p1Button3 = IOKeyMap.Service;
 
-    [ConfigEntry(name: "按钮 4（圆形）")]
-    private static readonly IOKeyMap button4 = IOKeyMap.Select2P;
+    [ConfigEntry(name: "1P 按钮 4（圆形）")]
+    private static readonly IOKeyMap p1Button4 = IOKeyMap.Select2P;
+
+    [ConfigEntry(name: "2P 按钮 1（三角形）")]
+    private static readonly IOKeyMap p2Button1 = IOKeyMap.Select1P;
+
+    [ConfigEntry(name: "2P 按钮 2（圆形）")]
+    private static readonly IOKeyMap p2Button2 = IOKeyMap.Test;
+
+    [ConfigEntry(name: "2P 按钮 3（圆形）")]
+    private static readonly IOKeyMap p2Button3 = IOKeyMap.Service;
+
+    [ConfigEntry(name: "2P 按钮 4（圆形）")]
+    private static readonly IOKeyMap p2Button4 = IOKeyMap.Select2P;
+
+    private static readonly IOKeyMap[][] keyMaps = new IOKeyMap[2][];
 
     private static readonly SystemButton[] auxiliaryButtonMap =
     [
@@ -130,6 +144,8 @@ public class MaimollerIO
 
     public static void OnBeforePatch()
     {
+        keyMaps[0] = [p1Button1, p1Button2, p1Button3, p1Button4];
+        keyMaps[1] = [p2Button1, p2Button2, p2Button3, p2Button4];
         _devices = [.. Enumerable.Range(0, 2).Select(i => (IMaimollerDevice)(useLegacy ? new MaimollerDeviceLegacy(i, alternative2p) : new MaimollerDeviceNative(i)))];
         for (int i = 0; i < 2; i++)
         {
@@ -158,34 +174,35 @@ public class MaimollerIO
         return _devices[playerNo].IsButtonPressed(buttonIndex1To8);
     }
 
-    // NOTE: Coin button is not supported yet. AquaMai recommands setting fixed number of credits directly in the configuration.
-
     private static AuxiliaryState GetAuxiliaryState()
     {
         var auxiliaryState = new AuxiliaryState();
-        IOKeyMap[] keyMaps = [button1, button2, button3, button4];
-        for (int i = 0; i < 4; i++)
+        for (int p = 0; p < 2; p++)
         {
-            var is1PPushed = button1p && _devices[0].IsSystemButtonPressed(auxiliaryButtonMap[i]);
-            var is2PPushed = button2p && _devices[1].IsSystemButtonPressed(auxiliaryButtonMap[i]);
-            switch (keyMaps[i])
+            if (p == 0 ? !button1p : !button2p) continue;
+            var maps = keyMaps[p];
+            for (int i = 0; i < 4; i++)
             {
-                case IOKeyMap.Select1P:
-                    auxiliaryState.select1P |= is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Select2P:
-                    auxiliaryState.select2P |= is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Select:
-                    auxiliaryState.select1P |= is1PPushed;
-                    auxiliaryState.select2P |= is2PPushed;
-                    break;
-                case IOKeyMap.Service:
-                    auxiliaryState.service = is1PPushed || is2PPushed;
-                    break;
-                case IOKeyMap.Test:
-                    auxiliaryState.test = is1PPushed || is2PPushed;
-                    break;
+                var isPushed = _devices[p].IsSystemButtonPressed(auxiliaryButtonMap[i]);
+                switch (maps[i])
+                {
+                    case IOKeyMap.Select1P:
+                        auxiliaryState.select1P |= isPushed;
+                        break;
+                    case IOKeyMap.Select2P:
+                        auxiliaryState.select2P |= isPushed;
+                        break;
+                    case IOKeyMap.Select:
+                        if (p == 0) auxiliaryState.select1P |= isPushed;
+                        else auxiliaryState.select2P |= isPushed;
+                        break;
+                    case IOKeyMap.Service:
+                        auxiliaryState.service |= isPushed;
+                        break;
+                    case IOKeyMap.Test:
+                        auxiliaryState.test |= isPushed;
+                        break;
+                }
             }
         }
         return auxiliaryState;
@@ -194,26 +211,28 @@ public class MaimollerIO
     private static CustomFnState GetCustomFnState()
     {
         var result = new CustomFnState();
-        IOKeyMap[] keyMaps = [button1, button2, button3, button4];
-        for (int i = 0; i < 4; i++)
+        for (int p = 0; p < 2; p++)
         {
-            var is1PPushed = button1p && _devices[0].IsSystemButtonPressed(auxiliaryButtonMap[i]);
-            var is2PPushed = button2p && _devices[1].IsSystemButtonPressed(auxiliaryButtonMap[i]);
-            var isPushed = is1PPushed || is2PPushed;
-            switch (keyMaps[i])
+            if (p == 0 ? !button1p : !button2p) continue;
+            var maps = keyMaps[p];
+            for (int i = 0; i < 4; i++)
             {
-                case IOKeyMap.CustomFn1:
-                    result.CustomFn1 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn2:
-                    result.CustomFn2 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn3:
-                    result.CustomFn3 |= isPushed;
-                    break;
-                case IOKeyMap.CustomFn4:
-                    result.CustomFn4 |= isPushed;
-                    break;
+                var isPushed = _devices[p].IsSystemButtonPressed(auxiliaryButtonMap[i]);
+                switch (maps[i])
+                {
+                    case IOKeyMap.CustomFn1:
+                        result.CustomFn1 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn2:
+                        result.CustomFn2 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn3:
+                        result.CustomFn3 |= isPushed;
+                        break;
+                    case IOKeyMap.CustomFn4:
+                        result.CustomFn4 |= isPushed;
+                        break;
+                }
             }
         }
 

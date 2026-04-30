@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using AquaMai.Config.Types;
@@ -59,7 +59,7 @@ public static class KeyListener
             KeyCodeOrName.Select1P => InputManager.GetButtonPush(0, InputManager.ButtonSetting.Select),
             KeyCodeOrName.Select2P => InputManager.GetButtonPush(1, InputManager.ButtonSetting.Select),
             <= KeyCodeOrName.CustomFn4 => _customFnState[key - KeyCodeOrName.CustomFn1],
-            _ => throw new ArgumentOutOfRangeException(nameof(key), key, "我也不知道这是什么键")
+            _ => Input.GetKey(key.GetKeyCode()) // 添加在枚举末尾的“新增键盘支持键”
         };
 
     // 获得按键是否被短按（会在按键被抬起的那一帧触发）
@@ -153,6 +153,7 @@ public static class KeyListener
             KeyCodeOrName.DownArrow => KeyCode.DownArrow,
             KeyCodeOrName.LeftArrow => KeyCode.LeftArrow,
             KeyCodeOrName.RightArrow => KeyCode.RightArrow,
+            KeyCodeOrName.Equals => KeyCode.Equals,
             _ => throw new ArgumentOutOfRangeException(nameof(keyCodeOrName), keyCodeOrName, "游戏功能键需要单独处理")
         };
 }
