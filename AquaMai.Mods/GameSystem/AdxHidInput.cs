@@ -294,7 +294,7 @@ public class AdxHidInput
         keyMaps[1] = [p2Button1, p2Button2, p2Button3, p2Button4];
     }
 
-    private static void ApplyAuxiliaryInput(AuxiliaryState state, IOKeyMap keyMap, bool isPushed, int playerNo)
+    private static void ApplyAuxiliaryInput(ref AuxiliaryState state, IOKeyMap keyMap, bool isPushed, int playerNo)
     {
         switch (keyMap)
         {
@@ -327,7 +327,7 @@ public class AdxHidInput
             {
                 var keyIndex = 10 + i;
                 var isPushed = inputLatch[p].ReadBit(keyIndex);
-                ApplyAuxiliaryInput(auxiliaryState, maps[i], isPushed, p);
+                ApplyAuxiliaryInput(ref auxiliaryState, maps[i], isPushed, p);
             }
         }
         return auxiliaryState;
