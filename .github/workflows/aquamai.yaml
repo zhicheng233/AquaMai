@@ -8,8 +8,12 @@ on:
 permissions:
   contents: read
 
+env:
+  BUILD_DEPENDENCIES_CACHE_KEY: AquaMai-build-dependencies-v1
+
 jobs:
   build-dependencies:
+    if: github.event_name != 'pull_request_target'
     runs-on: windows-latest
     steps:
       - name: Checkout build dependencies
@@ -32,11 +36,12 @@ jobs:
       - name: Save build dependencies cache
         uses: actions/cache/save@v4
         with:
-          key: AquaMai-build-dependencies-${{ github.run_id }}
+          key: ${{ env.BUILD_DEPENDENCIES_CACHE_KEY }}
           path: build-dependencies/SDEZ
 
   build:
     needs: build-dependencies
+    if: always() && (needs.build-dependencies.result == 'success' || needs.build-dependencies.result == 'skipped')
     runs-on: windows-latest
     outputs:
       git_describe: ${{ steps.git-describe.outputs.git_describe }}
@@ -93,7 +98,7 @@ jobs:
       - name: Restore build dependencies cache
         uses: actions/cache/restore@v4
         with:
-          key: AquaMai-build-dependencies-${{ github.run_id }}
+          key: ${{ env.BUILD_DEPENDENCIES_CACHE_KEY }}
           path: build-dependencies/SDEZ
           fail-on-cache-miss: true
 
