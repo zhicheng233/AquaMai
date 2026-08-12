@@ -38,10 +38,10 @@ public class PdxTouch
         zh: "E 区（最内圈传感器）的额外半径，可以为负值来缩小")]
     public static readonly float eAreaExtraRadius = 30;
 
-    [ConfigEntry("1P 设备路径", zh: "USB 端口路径，例如 2.2。请使用配置工具中显示的路径。留空则使用第一个检测到的设备作为 1P")]
+    [ConfigEntry("1P 设备标识", zh: "USB 序列号或端口路径，例如 2.2。请使用配置工具中显示的标识。留空则使用第一个检测到的设备作为 1P")]
     public static readonly string path1p = "";
 
-    [ConfigEntry("2P 设备路径")]
+    [ConfigEntry("2P 设备标识")]
     public static readonly string path2p = "";
 
     [ConfigEntry("触摸诊断日志",
@@ -61,8 +61,8 @@ public class PdxTouch
         playerNo,
         vid: 0x3356,
         pid: 0x3003,
-        serialNumber: null,  // PDX 设备没有序列号
-        locationPath,        // 使用路径匹配
+        serialNumber: locationPath,
+        locationPath,
         configuration: 1,
         interfaceNumber: 1,
         ReadEndpointID.Ep02,
@@ -124,7 +124,7 @@ public class PdxTouch
         playerNo,
         vid: 0x227D,
         pid: 0x0103,
-        serialNumber: null,  // 复合设备的 MI_00 子设备路径里不带序列号，只能用端口路径
+        serialNumber: locationPath,
         locationPath,
         configuration: 1,
         interfaceNumber: 0,

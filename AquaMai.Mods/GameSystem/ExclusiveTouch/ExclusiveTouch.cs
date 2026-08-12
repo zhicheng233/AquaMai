@@ -122,16 +122,18 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
 
     private UsbDeviceFinder CreateFinder()
     {
-        // 方便组 2P
+        if (!string.IsNullOrWhiteSpace(serialNumber) && !string.IsNullOrWhiteSpace(locationPath))
+        {
+            return new UsbDeviceIdentifierFinder(vid, pid, serialNumber);
+        }
+
         if (!string.IsNullOrWhiteSpace(serialNumber))
         {
-            // 优先使用序列号
             return new UsbDeviceFinder(vid, pid, serialNumber);
         }
 
         if (!string.IsNullOrWhiteSpace(locationPath))
         {
-            // 使用位置路径匹配
             return new UsbDeviceLocationFinder(vid, pid, locationPath);
         }
 
