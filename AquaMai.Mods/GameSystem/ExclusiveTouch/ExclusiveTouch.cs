@@ -122,14 +122,9 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
 
     private UsbDeviceFinder CreateFinder()
     {
-        if (!string.IsNullOrWhiteSpace(serialNumber) && !string.IsNullOrWhiteSpace(locationPath))
-        {
-            return new UsbDeviceIdentifierFinder(vid, pid, serialNumber);
-        }
-
         if (!string.IsNullOrWhiteSpace(serialNumber))
         {
-            return new UsbDeviceFinder(vid, pid, serialNumber);
+            return new UsbDeviceIdentifierFinder(vid, pid, serialNumber);
         }
 
         if (!string.IsNullOrWhiteSpace(locationPath))
@@ -146,7 +141,10 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
         UsbDevice newDevice = null;
         try
         {
-            newDevice = UsbDevice.OpenUsbDevice(CreateFinder());
+            var finder = CreateFinder();
+            newDevice = finder is UsbDeviceIdentifierFinder identifierFinder
+                ? identifierFinder.OpenUsbDevice(DiagnosticName, playerNo)
+                : UsbDevice.OpenUsbDevice(finder);
             if (newDevice == null) return false;
 
             if (newDevice is WinUsbDevice winUsbDevice)
@@ -175,8 +173,8 @@ public abstract class ExclusiveTouchBase(int playerNo, int vid, int pid, [CanBeN
                 device = newDevice;
             }
             ExclusiveTouchDiagnostics.Log(
-                "{0} player={1} connected driver={2}",
-                DiagnosticName, playerNo + 1, newDevice.DriverMode);
+                "{0} player={1} connected identifier={2} device-path={3} driver={4}",
+                DiagnosticName, playerNo + 1, serialNumber, newDevice.DevicePath, newDevice.DriverMode);
             return true;
         }
         catch (Exception e)
