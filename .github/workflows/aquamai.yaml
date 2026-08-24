@@ -5,32 +5,18 @@ on:
   push:
   pull_request_target:
 
+permissions:
+  contents: read
+
+env:
+  BUILD_DEPENDENCIES_CACHE_KEY: AquaMai-build-dependencies-v1
+
 jobs:
-  build:
+  build-dependencies:
+    if: github.event_name != 'pull_request_target'
     runs-on: windows-latest
     steps:
-      - name: Fix Git line encoding bug
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get Git Describe
-        run: |
-          $raw = git describe --tags --always
-          if ($raw.StartsWith("v")) { $raw = $raw.Substring(1) }
-          $parts = $raw.Split('-')
-          if ($parts.Length -ge 3) {
-            $ver = $parts[0].Split('.')
-            $ver[2] = $parts[1]
-            $raw = ($ver -join '.') + '-' + $parts[2]
-          }
-          echo "GIT_DESCRIBE=$raw" >> $env:GITHUB_ENV
-
-      - name: Checkout Assets
+      - name: Checkout build dependencies
         uses: clansty/checkout@main
         with:
           repository: MuNET-OSS/AquaMai-Build-Assets
@@ -40,24 +26,141 @@ jobs:
           min-retry-interval: 1
           max-retry-interval: 5
 
-      - name: Build AquaMai
-        shell: cmd
+      - name: Stage build dependencies
+        shell: pwsh
         run: |
-          copy /y build-assets\SDEZ\* Libs
-          powershell ./build.ps1
+          New-Item -ItemType Directory -Path "build-dependencies/SDEZ" -Force | Out-Null
+          Copy-Item -Path "build-assets/SDEZ/AMDaemon.NET.dll" -Destination "build-dependencies/SDEZ/AMDaemon.NET.dll" -Force
+          Copy-Item -Path "build-assets/SDEZ/Assembly-CSharp.dll" -Destination "build-dependencies/SDEZ/Assembly-CSharp.dll" -Force
+
+      - name: Save build dependencies cache
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ env.BUILD_DEPENDENCIES_CACHE_KEY }}
+          path: build-dependencies/SDEZ
+
+  build:
+    needs: build-dependencies
+    if: always() && (needs.build-dependencies.result == 'success' || needs.build-dependencies.result == 'skipped')
+    runs-on: windows-latest
+    outputs:
+      git_describe: ${{ steps.git-describe.outputs.git_describe }}
+    steps:
+      - name: Fix Git line encoding bug
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout pull request source
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: source
+          persist-credentials: false
+
+      - name: Checkout source
+        if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+          path: source
+          persist-credentials: false
+
+      - name: Checkout trusted scripts
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-source
+          persist-credentials: false
+
+      - name: Get Git Describe
+        id: git-describe
+        shell: pwsh
+        working-directory: source
+        run: |
+          $raw = git describe --tags --always
+          if ($raw.StartsWith("v")) { $raw = $raw.Substring(1) }
+          $parts = $raw.Split('-')
+          if ($parts.Length -ge 3) {
+            $ver = $parts[0].Split('.')
+            $ver[2] = $parts[1]
+            $raw = ($ver -join '.') + '-' + $parts[2]
+          }
+          "GIT_DESCRIBE=$raw" >> $env:GITHUB_ENV
+          "git_describe=$raw" >> $env:GITHUB_OUTPUT
+
+      - name: Restore build dependencies cache
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ env.BUILD_DEPENDENCIES_CACHE_KEY }}
+          path: build-dependencies/SDEZ
+          fail-on-cache-miss: true
+
+      - name: Build AquaMai
+        shell: pwsh
+        working-directory: source
+        run: |
+          New-Item -ItemType Directory -Path "Libs" -Force | Out-Null
+          Copy-Item -Path "../build-dependencies/SDEZ/*" -Destination "Libs" -Force
+          if ("${{ github.event_name }}" -eq "pull_request_target") {
+            & ../trusted-source/build.ps1 -SourceRoot .
+          } else {
+            & ./build.ps1
+          }
 
       - name: Prepare artifact
-        shell: cmd
+        shell: pwsh
+        working-directory: source
         run: |
-          cd Output
-          mkdir Upload
-          move AquaMai.dll Upload
-          move AquaMai.*.toml Upload
+          New-Item -ItemType Directory -Path "Output/Upload" -Force | Out-Null
+          Move-Item -Path "Output/AquaMai.dll" -Destination "Output/Upload/AquaMai.dll" -Force
+          Move-Item -Path "Output/AquaMai.zh.toml" -Destination "Output/Upload/AquaMai.zh.toml" -Force
+          Move-Item -Path "Output/AquaMai.en.toml" -Destination "Output/Upload/AquaMai.en.toml" -Force
+
+      - name: Upload unsigned artifact
+        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AquaMai-unsigned
+          path: source/Output/Upload
+
+      - name: Upload artifact
+        if: github.event_name == 'pull_request_target' || github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AquaMai
+          path: source/Output/Upload
+
+  release:
+    needs: build
+    if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    steps:
+      - name: Download unsigned artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AquaMai-unsigned
+          path: Output/Upload
+
+      - name: Checkout release assets
+        uses: clansty/checkout@main
+        with:
+          repository: MuNET-OSS/AquaMai-Build-Assets
+          ssh-key: ${{ secrets.BUILD_ASSETS_KEY }}
+          path: release-assets
+          max-attempts: 50
+          min-retry-interval: 1
+          max-retry-interval: 5
 
       - name: Sign and Upload CI release
-        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
         shell: cmd
-        run: build-assets\Releaser\AquaMaiReleaser.exe "Output\Upload\AquaMai.dll" "${{ env.GIT_DESCRIBE }}"
+        run: release-assets\Releaser\AquaMaiReleaser.exe "Output\Upload\AquaMai.dll" "${{ needs.build.outputs.git_describe }}"
         env:
           LEGACY_RELEASE_SIGN_PK: ${{ secrets.LEGACY_RELEASE_SIGN_PK }}
           RELEASE_SIGN_V2_PK: ${{ secrets.RELEASE_SIGN_V2_PK }}
@@ -70,16 +173,21 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: AquaMai
-          path: Output\Upload
+          path: Output/Upload
 
       - name: Send to Telegram
-        if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GIT_DESCRIBE: ${{ needs.build.outputs.git_describe }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
         run: |
-          $Uri = "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMediaGroup"
+          $Uri = "https://api.telegram.org/bot$env:TELEGRAM_BOT_TOKEN/sendMediaGroup"
+          $GitDescribe = $env:GIT_DESCRIBE
+          $CommitMessage = $env:COMMIT_MESSAGE
           $Form = @{
             chat_id = "-1002231087502"
             media = @(
-              @{ type = "document"; media = "attach://aquamai_main"; caption = "${{ env.GIT_DESCRIBE }}`n${{ github.event.commits[0].message }}" },
+              @{ type = "document"; media = "attach://aquamai_main"; caption = "$GitDescribe`n$CommitMessage" },
               @{ type = "document"; media = "attach://aquamai_zh" }
               @{ type = "document"; media = "attach://aquamai_en" }
             ) | ConvertTo-Json

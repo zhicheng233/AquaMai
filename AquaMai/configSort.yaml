@@ -71,6 +71,7 @@
 选曲界面:
   - UX.HideSelfMadeCharts
   - UX.SelectionDetail
+  - GameSystem.SongConstantSort
 
 美化:
   - Fancy.GamePlay.HideHanabi
@@ -100,6 +101,7 @@
   - Fancy.HideMask
   - Tweaks.TimeSaving.CheckSkip
   - Utils.InstantQuit
+  - GameSystem.StartupDirectToGame
   - Fancy.Triggers
 
 过新过热（实验性）:
