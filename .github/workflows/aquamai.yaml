@@ -123,6 +123,16 @@ jobs:
           Move-Item -Path "Output/AquaMai.zh.toml" -Destination "Output/Upload/AquaMai.zh.toml" -Force
           Move-Item -Path "Output/AquaMai.en.toml" -Destination "Output/Upload/AquaMai.en.toml" -Force
 
+      - name: Upload config sort check input
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: config-sort-check-input
+          path: |
+            source/checkSort.py
+            source/AquaMai/configSort.yaml
+            source/Output/Upload/AquaMai.zh.toml
+
       - name: Upload unsigned artifact
         if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
