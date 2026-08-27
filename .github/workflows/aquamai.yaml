@@ -34,8 +34,8 @@ jobs:
       - name: Download build references
         shell: pwsh
         env:
-          REFERENCE_ARCHIVE_URL: ${{ vars.AQUAMAI_CI_REFERENCE_URL }}
-          REFERENCE_ARCHIVE_SHA256: ${{ vars.AQUAMAI_CI_REFERENCE_SHA256 }}
+          REFERENCE_ARCHIVE_URL: https://res.mumur.net/aquamai-ci-reference.zip
+          REFERENCE_ARCHIVE_SHA256: 4a3ef389ce03f8400822cf5b749ff97a535b0ff709b757df4770cbb558335c22
         run: |
           $archivePath = Join-Path $env:RUNNER_TEMP "aquamai-ci-reference.zip"
           Invoke-WebRequest -Uri $env:REFERENCE_ARCHIVE_URL -OutFile $archivePath
