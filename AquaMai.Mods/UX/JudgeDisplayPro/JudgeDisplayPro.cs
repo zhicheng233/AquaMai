@@ -15,8 +15,8 @@ namespace AquaMai.Mods.UX.JudgeDisplayPro;
 
 [ConfigSection(
     name: "高级判定显示",
-    en: "Judge Display Pro",
-    zh: "自定义游戏内判定显示")]
+    en: "Customize the judgment style display for all types of notes. When enabled, this will override the game's default judgment style presets. Change your desired display style in the game settings.",
+    zh: "可自定义所有种类音符显示的判定样式，开启后将替代游戏原本的判定样式预设。需要在游戏设置中更改需要的显示样式")]
 [ConfigCollapseNamespace]
 public partial class JudgeDisplayPro
 {
