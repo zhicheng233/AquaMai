@@ -12,7 +12,6 @@ using System.Reflection.Emit;
 using System.Reflection;
 using AquaMai.Mods.GameSystem;
 using MAI2.Util;
-using Main;
 using Manager.Operation;
 using MelonLoader;
 
@@ -52,39 +51,6 @@ public class Common
         __result = UnityEngine.Input.GetKeyDown(name);
         return false;
     }
-    
-    //用于修复GetKeyDown() Patch不生效
-    //由于KeyListener.CheckLongPush()的优先级在GetKeyDown()之前
-    //导致Mono JIT在编译GameMainObject.Update()时(此时DebugInput.GetKeyDown()还没被Patch)，将GetKeyDown()优化内联成 false
-    //该方法用于在Patch DebugInput.GetKeyDown() 后重新Patch Update()让Mono JIT取消内联优化
-    //反正这样写能跑 (逃
-    private static void RepatchGameMainObjectUpdate(HarmonyLib.Harmony h)
-    {
-        if (!FixDebugKeyboardInput)
-            return;
-
-        var update = AccessTools.Method(
-            typeof(GameMainObject),
-            "Update"
-        );
-
-        if (update is null)
-            return;
-
-        h.Patch(
-            update,
-            prefix: new HarmonyMethod(
-                typeof(Common),
-                nameof(RepatchUpdatePrefix)
-            )
-        );
-    }
-
-    private static void RepatchUpdatePrefix()
-    {
-        // Intentionally empty.
-    }
-    
 
     [EnableIf(nameof(fixDebugInput))]
     [HarmonyPrefix]
@@ -177,8 +143,6 @@ public class Common
 
     public static void OnAfterPatch(HarmonyLib.Harmony h)
     {
-        RepatchGameMainObjectUpdate(h);
-        
         if (bypassSpecialNumCheck)
         {
             if (typeof(GameManager).GetMethod("CalcSpecialNum") is null) return;
