@@ -14,6 +14,7 @@ namespace AquaMai.Core.Helpers;
 /// 在 Unity Mono 环境下，若<b>外层（caller）方法</b>在 JIT 编译时，其调用的<b>内层（callee）方法</b>尚未被 Harmony patch，
 /// JIT 可能将内层调用内联进外层。
 /// 这样即便之后 patch了内层方法，但外层已编译好的函数仍然会调用老的未patch版本的内层函数，从而表现为「某些 patch 不生效 / 钩子像没打上一样」。
+/// 参见：https://github.com/BepInEx/HarmonyX/issues/71#issuecomment-1495402151
 /// </para>
 /// <para>
 /// 已知案例：

@@ -280,6 +280,8 @@ public static class DisplayTouchInGame
         }
     }
 
+    // 详见 AquaMai.Core/Helpers/HarmonyPatchRecompile.cs 中的说明，Maimoller官方IO Mod中会先行Patch MouseTouchPanel.Start，
+    // 造成我们上面对内层函数 InputManager.RegisterMouseTouchPanel 的patch失效。因此这里需要这样处理一下。
     public static void OnAfterPatch()
     {
         HarmonyPatchRecompile.RecompileMethod(typeof(MouseTouchPanel), "Start");
