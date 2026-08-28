@@ -49,7 +49,7 @@ public static class HarmonyPatchRecompile
         catch (Exception ex)
         {
             MelonLogger.Warning(
-                $"重编译 {method.DeclaringType?.FullName}.{method.Name} 方法失败: {ex.Message}");
+                $"重编译 {method?.DeclaringType?.FullName}.{method?.Name} 方法失败: {ex.Message}");
         }
     }
 
